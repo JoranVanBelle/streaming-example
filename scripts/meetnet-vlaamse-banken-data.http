@@ -1,0 +1,2 @@
+GET {{baseUrl}}/V2/currentData
+authorization: Bearer {{token}}

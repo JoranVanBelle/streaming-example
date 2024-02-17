@@ -1,0 +1,26 @@
+spring:
+  kafka:
+
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      groupId: ${random.uuid}
+      clientId: ${random.uuid}
+      keyDeserializer: org.apache.kafka.common.serialization.StringDeserializer
+      valueDeserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+
+    producer:
+      keySerializer: org.apache.kafka.common.serialization.StringSerializer
+      valueSerializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      client-id: ${random.uuid}
+
+    streams:
+      application-id: ${random.uuid}
+      client-id: ${random.uuid}
+
+    properties:
+      auto.register.schemas: true
+      schema.registry.url: mock://schema-registry
+      specific.avro.reader: true
+      allow.auto.create.topics: true
+      value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicRecordNameStrategy

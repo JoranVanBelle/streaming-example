@@ -1,0 +1,17 @@
+spring:
+  docker:
+    compose:
+      enabled: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    streams:
+      application-id: streaming-example-streams
+      client-id: streaming-example-streams
+
+    properties:
+      schema.registry.url: http://localhost:8081
+
+server:
+  port: 1234

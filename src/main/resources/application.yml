@@ -1,0 +1,66 @@
+example:
+  http:
+    meetnet-vlaamse-banken:
+      base-url: https://api.meetnetvlaamsebanken.be
+      username: joran.vanbelle2@student.hogent.be
+      password: LMsQ%25!fVp3DmrYe76Z*H
+      sensor-ids:
+        - NP7WRS  # Average wind direction
+        - NPBGH1  # 10% highest waves
+        - NP7WVC  # Average wind speed (at 10 m height)
+      location-key:
+        mapping:
+          NP: Nieuwpoort
+  weather:
+    wind-speed: 10
+    wave-height: 30
+    wind-direction:
+      from: 235
+      until: 45
+
+  kafka:
+    topics:
+      raw-data-measured: org.streaming.example.raw-data-measured
+      wind-detected: org.streaming.example.wind-detected
+      wave-detected: org.streaming.example.wave-detected
+      wind-direction-detected: org.streaming.example.wind-direction-detected
+      rekeyed-wind-detected: org.streaming.example.rekeyed-wind-detected
+      rekeyed-wave-detected: org.streaming.example.rekeyed-wave-detected
+      rekeyed-wind-direction-detected: org.streaming.example.rekeyed-wind-direction-detected
+
+spring:
+  docker:
+    compose:
+      enabled: false
+
+  kafka:
+    consumer:
+      keyDeserializer: org.apache.kafka.common.serialization.StringDeserializer
+      valueDeserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+
+    producer:
+      client-id: streaming-example-producer
+      keySerializer: org.apache.kafka.common.serialization.StringSerializer
+      valueSerializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+
+    streams:
+      application-id: streaming-example
+      client-id: streaming-example
+      properties:
+          allow.auto.create.topics: true
+
+
+    properties:
+      specific.avro.reader: true
+      allow.auto.create.topics: false
+      auto.register.schemas: true
+      value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
+
+logging:
+  level:
+    root: INFO
+    org.apache.kafka.clients.producer.ProducerConfig: WARN
+    org.apache.kafka.clients.consumer.ConsumerConfig: WARN
+    org.apache.kafka.clients.admin.AdminClientConfig: WARN
+    org.apache.kafka.streams.StreamsConfig: WARN
+    io.confluent.kafka.serializers: WARN

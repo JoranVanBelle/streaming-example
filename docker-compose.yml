@@ -1,0 +1,159 @@
+version: '3.7'
+name: streaming-example
+
+volumes:
+  postgres:
+
+services:
+  # Redpanda cluster
+  redpanda-1:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.1.1
+    container_name: redpanda-1
+    command:
+      - redpanda
+      - start
+      - --smp
+      - '1'
+      - --reserve-memory
+      - 0M
+      - --overprovisioned
+      - --node-id
+      - '1'
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda-1:29092,OUTSIDE://localhost:9092
+      - --pandaproxy-addr
+      - PLAINTEXT://0.0.0.0:28082,OUTSIDE://0.0.0.0:8082
+      - --advertise-pandaproxy-addr
+      - PLAINTEXT://redpanda-1:28082,OUTSIDE://localhost:8082
+      - --rpc-addr
+      - 0.0.0.0:33145
+      - --advertise-rpc-addr
+      - redpanda-1:33145
+    ports:
+      - 8081:8081
+      - 8082:8082
+      - 9092:9092
+      - 9644:9644
+      - 28082:28082
+      - 29092:29092
+
+  redpanda-2:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.1.1
+    container_name: redpanda-2
+    command:
+      - redpanda
+      - start
+      - --smp
+      - '1'
+      - --reserve-memory
+      - 0M
+      - --overprovisioned
+      - --node-id
+      - '2'
+      - --seeds
+      - redpanda-1:33145
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29093,OUTSIDE://0.0.0.0:9093
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda-2:29093,OUTSIDE://localhost:9093
+      - --pandaproxy-addr
+      - PLAINTEXT://0.0.0.0:28083,OUTSIDE://0.0.0.0:8083
+      - --advertise-pandaproxy-addr
+      - PLAINTEXT://redpanda-2:28083,OUTSIDE://localhost:8083
+      - --rpc-addr
+      - 0.0.0.0:33146
+      - --advertise-rpc-addr
+      - redpanda-2:33146
+    ports:
+      - 8083:8083
+      - 9093:9093
+
+  redpanda-3:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.1.1
+    container_name: redpanda-3
+    command:
+      - redpanda
+      - start
+      - --smp
+      - '2'
+      - --reserve-memory
+      - 0M
+      - --overprovisioned
+      - --node-id
+      - '3'
+      - --seeds
+      - redpanda-1:33145
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29094,OUTSIDE://0.0.0.0:9094
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda-3:29094,OUTSIDE://localhost:9094
+      - --pandaproxy-addr
+      - PLAINTEXT://0.0.0.0:28084,OUTSIDE://0.0.0.0:8084
+      - --advertise-pandaproxy-addr
+      - PLAINTEXT://redpanda-3:28084,OUTSIDE://localhost:8084
+      - --rpc-addr
+      - 0.0.0.0:33147
+      - --advertise-rpc-addr
+      - redpanda-3:33147
+    ports:
+      - 8084:8084
+      - 9094:9094
+
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:v2.2.2
+    container_name: redpanda-console
+    entrypoint: /bin/sh
+    command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["redpanda-1:29092"]
+          schemaRegistry:
+            enabled: true
+            urls: ["http://redpanda-1:8081"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda-1:9644"]
+        connect:
+          enabled: false
+    ports:
+      - 8080:8080
+    depends_on:
+      - redpanda-1
+
+  topic-setup:
+    image: confluentinc/cp-kafka:7.4.1
+    depends_on:
+      - redpanda-1
+    command:
+      - /bin/bash
+      - -c
+      - |
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.raw-data-measured --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.wind-detected --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.wave-detected --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.wind-direction-detected --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.rekeyed-wind-detected --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.rekeyed-wave-detected --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.rekeyed-wind-direction-detected --replication-factor 1 --partitions 1
+      
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic streaming-example-streams-WindProcessorStateStore-changelog --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic streaming-example-streams-WaveProcessorStateStore-changelog --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic streaming-example-streams-WindDirectionProcessorStateStore-changelog --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --list
+        echo 'Topics are created'
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
