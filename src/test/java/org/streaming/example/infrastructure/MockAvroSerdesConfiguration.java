@@ -40,6 +40,18 @@ public class MockAvroSerdesConfiguration implements AvroSerdesFactory {
     }
 
     @Override
+    public SpecificAvroSerde<?> specificSerde() {
+        final SpecificAvroSerde<?> specificSerde= new SpecificAvroSerde<>();
+        Map<String, Object> serdeConfig = new HashMap<>();
+        serdeConfig.put("schema.registry.url", schema_registry);
+        serdeConfig.put("auto.register.schemas", true);
+        serdeConfig.put("value.subject.name.strategy", TopicRecordNameStrategy.class);
+        serdeConfig.put("specific.avro.reader", true);
+        specificSerde.configure(serdeConfig, false);
+        return specificSerde;
+    }
+
+    @Override
     public <T extends SpecificRecord> Deserializer<T> specificAvroValueDeserializer() {
         Deserializer<T> deserializer = (new SpecificAvroSerde<T>(this.client)).deserializer();
         deserializer.configure(this.getSpecificDeserializerProperties(), false);

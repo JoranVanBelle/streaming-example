@@ -2,26 +2,32 @@
   "type": "record",
   "name": "KiteableWaveDetected",
   "namespace": "org.streaming.example",
+  "doc": "Created when the wave measured is considered kiteable",
   "fields": [
     {
       "name": "sensorId",
-      "type": "string"
+      "type": "string",
+      "doc": "The id of the sensor extracted from the api result"
     },
     {
       "name": "location",
-      "type": "string"
+      "type": "string",
+      "doc": "The location of where the sensor is"
     },
     {
       "name": "value",
-      "type": "string"
+      "type": "string",
+      "doc": "The value of de sensor at the time the api sent its result"
     },
     {
       "name": "unit",
-      "type": "string"
+      "type": "string",
+      "doc": "The unit in which the value of the sensor is expressed"
     },
     {
       "name": "description",
-      "type": "string"
+      "type": "string",
+      "doc": "A description about what the sensor returns"
     }
   ]
 }

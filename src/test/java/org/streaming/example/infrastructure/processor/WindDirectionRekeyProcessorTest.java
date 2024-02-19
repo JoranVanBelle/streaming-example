@@ -59,7 +59,7 @@ public class WindDirectionRekeyProcessorTest {
         //given
         var key = UUID.randomUUID().toString();
         var kiteableWind = KiteableWindDirectionDetectedMother.newEvent()
-                .withSensorId("NP-%s-GH1".formatted(key))
+                .withSensorId("NP-%s-WRS".formatted(key))
                 .buildEvent();
 
         // when
@@ -76,7 +76,7 @@ public class WindDirectionRekeyProcessorTest {
         //given
         var key = UUID.randomUUID().toString();
         var kiteableWind = KiteableWindDirectionDetectedMother.newEvent()
-                .withSensorId("NP-%s-GH1".formatted(key))
+                .withSensorId("NP-%s-WRS".formatted(key))
                 .buildEvent();
 
         // when
@@ -86,7 +86,7 @@ public class WindDirectionRekeyProcessorTest {
         var result = windDirectionRekeyTopic.readKeyValuesToList();
 
         assertThat(result.getLast().value).isEqualTo(new KiteableWindDirectionDetected(
-                "NP-%s-GH1".formatted(key),
+                "NP-%s-WRS".formatted(key),
                 "Nieuwpoort - Wind measurement",
                 "270",
                 "deg",

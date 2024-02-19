@@ -45,6 +45,15 @@ public class SerdesFactory implements AvroSerdesFactory {
     }
 
     @Override
+    public SpecificAvroSerde<?> specificSerde() {
+        final SpecificAvroSerde<?> rawDataMeasuredSerde = new SpecificAvroSerde<>();
+        Map<String, String> serdeConfig = new HashMap<>();
+        serdeConfig.put("schema.registry.url", schema_registry);
+        rawDataMeasuredSerde.configure(serdeConfig, false);
+        return rawDataMeasuredSerde;
+    }
+
+    @Override
     public <T extends SpecificRecord> Deserializer<T> specificAvroValueDeserializer() {
         SpecificAvroDeserializer<T> deserializer = new SpecificAvroDeserializer<>();
         deserializer.configure(this.withSpecificReaderConfig(this.kafkaProperties.buildConsumerProperties((SslBundles)null)), false);

@@ -42,7 +42,7 @@ public class UnkiteableWaveDetectedMother {
             return this;
         }
 
-        public UnkiteableWaveDetected build() {
+        public UnkiteableWaveDetected buildEvent() {
 
             return UnkiteableWaveDetected.newBuilder()
                     .setSensorId(sensorId)
@@ -51,6 +51,17 @@ public class UnkiteableWaveDetectedMother {
                     .setUnit(unit)
                     .setDescription(description)
                     .build();
+        }
+
+        public UnkiteableWaveDetected buildMother() {
+
+            return new UnkiteableWaveDetected(
+                    sensorId,
+                    location,
+                    value,
+                    unit,
+                    description
+            );
         }
     }
     

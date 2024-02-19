@@ -10,13 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.streaming.example.KiteableWaveDetected;
 import org.streaming.example.KiteableWindDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
 import org.streaming.example.domain.TopologyTest;
-import org.streaming.example.mothers.KiteableWaveDetectedMother;
 import org.streaming.example.mothers.KiteableWindSpeedDetectedMother;
 
 import java.util.UUID;
@@ -59,7 +57,7 @@ public class WindRekeyProcessorTest {
         //given
         var key = UUID.randomUUID().toString();
         var kiteableWind = KiteableWindSpeedDetectedMother.newEvent()
-                .withSensorId("NP-%s-GH1".formatted(key))
+                .withSensorId("NP-%s-WVC".formatted(key))
                 .buildEvent();
 
         // when

@@ -6,6 +6,8 @@ import org.apache.kafka.streams.Topology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.config.KafkaStreamsInfrastructureCustomizer;
+import org.streaming.example.domain.kafka.ProcessorDefinition;
+import org.streaming.example.domain.kafka.SourceDefinition;
 import org.streaming.example.domain.kafka.TopologyDefinition;
 
 import java.util.Arrays;
@@ -24,8 +26,8 @@ public class KafkaTopologyCustomizer implements KafkaStreamsInfrastructureCustom
     @Override
     public void configureTopology(Topology topology) {
         topologyDefinitions.forEach(def -> {
-            def.sources().forEach(s -> topology.addSource(source(s.topic()), new StringDeserializer(), s.valueDeserializer(), s.topic()));
-            def.processors().forEach(p -> topology.addProcessor(p.name(), p.supplier(), source(p.parents())));
+            def.sources().forEach(s -> topology.addSource(s.topic(), new StringDeserializer(), s.valueDeserializer(), s.topic()));
+            def.processors().forEach(p -> topology.addProcessor(p.name(), p.supplier(), p.parents()));
             def.sinks().forEach(s -> topology.addSink(sink(s.topic()), s.topic(), new StringSerializer(), s.valueSerializer(), s.parents()));
             def.stateStores().forEach(s -> topology.addStateStore(s.storeBuilder(), s.processors()));
             LOGGER.info("Current topology: \n%s".formatted(topology.describe()));

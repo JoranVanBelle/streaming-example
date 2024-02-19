@@ -9,6 +9,7 @@ import org.streaming.example.RawDataMeasured;
 
 public interface AvroSerdesFactory {
     SpecificAvroSerde<RawDataMeasured> rawDataMeasuredSerde();
+    SpecificAvroSerde<?> specificSerde();
     <T extends SpecificRecord> Deserializer<T> specificAvroValueDeserializer();
     KafkaAvroSerializer avroSerializer();
     KafkaAvroDeserializer avroDeserializer();

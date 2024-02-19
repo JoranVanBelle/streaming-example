@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.streaming.example.KiteableWaveDetected;
+import org.streaming.example.UnkiteableWaveDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
@@ -62,6 +64,7 @@ class WaveProcessorTest {
         var notKiteableWaves2 = RawWaveHeightMeasured.newEvent()
                 .withNotKiteableWave()
                 .withSensorId("NP-%s-GH1".formatted(key))
+                .withValue("-1")
                 .build();
 
         // when
@@ -69,9 +72,23 @@ class WaveProcessorTest {
         rawDataMeasuredTopic.pipeInput(notKiteableWaves2.getSensorId(), notKiteableWaves2);
 
         // then
-        var result = waveTopic.readRecordsToList();
+        var result = waveTopic.readValuesToList();
 
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).contains(new UnkiteableWaveDetected(
+                notKiteableWaves.getSensorId(),
+                notKiteableWaves.getLocation(),
+                notKiteableWaves.getValue(),
+                notKiteableWaves.getUnit(),
+                notKiteableWaves.getDescription()
+        ));
+
+        assertThat(result).doesNotContain(new UnkiteableWaveDetected(
+                notKiteableWaves2.getSensorId(),
+                notKiteableWaves2.getLocation(),
+                notKiteableWaves2.getValue(),
+                notKiteableWaves2.getUnit(),
+                notKiteableWaves2.getDescription()
+        ));
     }
 
     @Test
@@ -83,8 +100,9 @@ class WaveProcessorTest {
                 .withSensorId("NP-%s-GH1".formatted(key))
                 .build();
         var kiteableWaves2 = RawWaveHeightMeasured.newEvent()
-                .withKiteableWave()
+                .withValue("1001")
                 .withSensorId("NP-%s-GH1".formatted(key))
+                .withValue("-1")
                 .build();
 
         // when
@@ -92,9 +110,23 @@ class WaveProcessorTest {
         rawDataMeasuredTopic.pipeInput(kiteableWaves2.getSensorId(), kiteableWaves2);
 
         // then
-        var result = waveTopic.readRecordsToList();
+        var result = waveTopic.readValuesToList();
 
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).contains(new KiteableWaveDetected(
+                kiteableWaves.getSensorId(),
+                kiteableWaves.getLocation(),
+                kiteableWaves.getValue(),
+                kiteableWaves.getUnit(),
+                kiteableWaves.getDescription()
+        ));
+
+        assertThat(result).doesNotContain(new KiteableWaveDetected(
+                kiteableWaves2.getSensorId(),
+                kiteableWaves2.getLocation(),
+                kiteableWaves2.getValue(),
+                kiteableWaves2.getUnit(),
+                kiteableWaves2.getDescription()
+        ));
     }
 
     @Test
@@ -115,13 +147,27 @@ class WaveProcessorTest {
         rawDataMeasuredTopic.pipeInput(kiteableWaves.getSensorId(), kiteableWaves);
 
         // then
-        var result = waveTopic.readRecordsToList();
+        var result = waveTopic.readValuesToList();
 
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).contains(new UnkiteableWaveDetected(
+                notKiteableWaves.getSensorId(),
+                notKiteableWaves.getLocation(),
+                notKiteableWaves.getValue(),
+                notKiteableWaves.getUnit(),
+                notKiteableWaves.getDescription()
+        ));
+
+        assertThat(result).contains(new KiteableWaveDetected(
+                kiteableWaves.getSensorId(),
+                kiteableWaves.getLocation(),
+                kiteableWaves.getValue(),
+                kiteableWaves.getUnit(),
+                kiteableWaves.getDescription()
+        ));
     }
 
     @Test
-    void givenKiteableWaves_whenNotKiteableWaveDetected_oneEventShouldBeFound() {
+    void givenKiteableWaves_whenNotKiteableWaveDetected_twoEventsShouldBeFound() {
         //given
         var key = UUID.randomUUID().toString();
         var kiteableWaves = RawWaveHeightMeasured.newEvent()
@@ -138,9 +184,23 @@ class WaveProcessorTest {
         rawDataMeasuredTopic.pipeInput(notKiteableWaves.getSensorId(), notKiteableWaves);
 
         // then
-        var result = waveTopic.readRecordsToList();
+        var result = waveTopic.readValuesToList();
 
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).contains(new KiteableWaveDetected(
+                kiteableWaves.getSensorId(),
+                kiteableWaves.getLocation(),
+                kiteableWaves.getValue(),
+                kiteableWaves.getUnit(),
+                kiteableWaves.getDescription()
+        ));
+
+        assertThat(result).contains(new UnkiteableWaveDetected(
+                notKiteableWaves.getSensorId(),
+                notKiteableWaves.getLocation(),
+                notKiteableWaves.getValue(),
+                notKiteableWaves.getUnit(),
+                notKiteableWaves.getDescription()
+        ));
     }
 
 }

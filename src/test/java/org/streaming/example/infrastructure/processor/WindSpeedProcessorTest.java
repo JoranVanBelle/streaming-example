@@ -10,6 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.streaming.example.KiteableWindDetected;
+import org.streaming.example.UnkiteableWaveDetected;
+import org.streaming.example.UnkiteableWindDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
@@ -53,17 +56,37 @@ class WindSpeedProcessorTest {
     void givenNotKiteableWind_whenNotKiteableWindDetected_oneEventShouldBeFound() {
         // given
         var key = UUID.randomUUID().toString();
-        var notKiteableWind = RawWindSpeedMeasured.newEvent().withNotKiteableWind().withSensorId("NP-%s-WVC".formatted(key)).withSensorId("NP-%s-WVC".formatted(key)).build();
-        var notKiteableWind2 = RawWindSpeedMeasured.newEvent().withNotKiteableWind().withSensorId("NP-%s-WVC".formatted(key)).withSensorId("NP-%s-WVC".formatted(key)).build();
+        var notKiteableWind = RawWindSpeedMeasured.newEvent()
+                .withNotKiteableWind()
+                .withSensorId("NP-%s-WVC".formatted(key))
+                .build();
+        var notKiteableWind2 = RawWindSpeedMeasured.newEvent()
+                .withValue("-2")
+                .withSensorId("NP-%s-WVC".formatted(key))
+                .build();
 
         // when
         rawDataMeasuredTopic.pipeInput(notKiteableWind.getSensorId(), notKiteableWind);
         rawDataMeasuredTopic.pipeInput(notKiteableWind2.getSensorId(), notKiteableWind2);
 
         // then
-        var result = windTopic.readKeyValuesToList();
+        var result = windTopic.readValuesToList();
 
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).contains(new UnkiteableWindDetected(
+                notKiteableWind.getSensorId(),
+                notKiteableWind.getLocation(),
+                notKiteableWind.getValue(),
+                notKiteableWind.getUnit(),
+                notKiteableWind.getDescription()
+        ));
+
+        assertThat(result).doesNotContain(new UnkiteableWindDetected(
+                notKiteableWind2.getSensorId(),
+                notKiteableWind2.getLocation(),
+                notKiteableWind2.getValue(),
+                notKiteableWind2.getUnit(),
+                notKiteableWind2.getDescription()
+        ));
     }
 
     @Test
@@ -75,7 +98,7 @@ class WindSpeedProcessorTest {
                 .withSensorId("NP-%s-WVC".formatted(key))
                 .build();
         var kiteableWind2 = RawWindSpeedMeasured.newEvent()
-                .withKiteableWind()
+                .withValue("1001")
                 .withSensorId("NP-%s-WVC".formatted(key))
                 .build();
 
@@ -84,13 +107,27 @@ class WindSpeedProcessorTest {
         rawDataMeasuredTopic.pipeInput(kiteableWind2.getSensorId(), kiteableWind2);
 
         // then
-        var result = windTopic.readKeyValuesToList();
+        var result = windTopic.readValuesToList();
 
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).contains(new KiteableWindDetected(
+                kiteableWind.getSensorId(),
+                kiteableWind.getLocation(),
+                kiteableWind.getValue(),
+                kiteableWind.getUnit(),
+                kiteableWind.getDescription()
+        ));
+
+        assertThat(result).doesNotContain(new KiteableWindDetected(
+                kiteableWind2.getSensorId(),
+                kiteableWind2.getLocation(),
+                kiteableWind2.getValue(),
+                kiteableWind2.getUnit(),
+                kiteableWind2.getDescription()
+        ));
     }
 
     @Test
-    void givenKiteableWind_whenNotKiteableWindDetected_oneEventShouldBeFound() {
+    void givenKiteableWind_whenNotKiteableWindDetected_twoEventsShouldBeFound() {
         // given
         var key = UUID.randomUUID().toString();
         var kiteableWind = RawWindSpeedMeasured.newEvent()
@@ -107,13 +144,27 @@ class WindSpeedProcessorTest {
         rawDataMeasuredTopic.pipeInput(notKiteableWind.getSensorId(), notKiteableWind);
 
         // then
-        var result = windTopic.readKeyValuesToList();
+        var result = windTopic.readValuesToList();
 
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).contains(new KiteableWindDetected(
+                kiteableWind.getSensorId(),
+                kiteableWind.getLocation(),
+                kiteableWind.getValue(),
+                kiteableWind.getUnit(),
+                kiteableWind.getDescription()
+        ));
+
+        assertThat(result).contains(new UnkiteableWindDetected(
+                notKiteableWind.getSensorId(),
+                notKiteableWind.getLocation(),
+                notKiteableWind.getValue(),
+                notKiteableWind.getUnit(),
+                notKiteableWind.getDescription()
+        ));
     }
 
     @Test
-    void givenNotKiteableWind_whenKiteableWindDetected_oneEventShouldBeFound() {
+    void givenNotKiteableWind_whenKiteableWindDetected_twoEventsShouldBeFound() {
         // given
         var key = UUID.randomUUID().toString();
         var notKiteableWind = RawWindSpeedMeasured.newEvent()
@@ -130,8 +181,22 @@ class WindSpeedProcessorTest {
         rawDataMeasuredTopic.pipeInput(kiteableWind.getSensorId(), kiteableWind);
 
         // then
-        var result = windTopic.readKeyValuesToList();
+        var result = windTopic.readValuesToList();
 
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).contains(new UnkiteableWindDetected(
+                notKiteableWind.getSensorId(),
+                notKiteableWind.getLocation(),
+                notKiteableWind.getValue(),
+                notKiteableWind.getUnit(),
+                notKiteableWind.getDescription()
+        ));
+
+        assertThat(result).contains(new KiteableWindDetected(
+                kiteableWind.getSensorId(),
+                kiteableWind.getLocation(),
+                kiteableWind.getValue(),
+                kiteableWind.getUnit(),
+                kiteableWind.getDescription()
+        ));
     }
 }

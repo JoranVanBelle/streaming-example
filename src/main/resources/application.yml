@@ -27,6 +27,7 @@ example:
       rekeyed-wind-detected: org.streaming.example.rekeyed-wind-detected
       rekeyed-wave-detected: org.streaming.example.rekeyed-wave-detected
       rekeyed-wind-direction-detected: org.streaming.example.rekeyed-wind-direction-detected
+      kite-weather-detected: org.streaming.example.weather-detected
 
 spring:
   docker:
@@ -47,7 +48,7 @@ spring:
       application-id: streaming-example
       client-id: streaming-example
       properties:
-          allow.auto.create.topics: true
+        allow.auto.create.topics: true
 
 
     properties:

@@ -11,21 +11,26 @@ import org.streaming.example.domain.kafka.SourceDefinition;
 import org.streaming.example.domain.kafka.StateStoreDefinition;
 import org.streaming.example.domain.kafka.TopologyDefinition;
 import org.streaming.example.domain.meetnetvlaamsebanken.LocationKeyMapping;
-import org.streaming.example.infrastructure.SerdesFactory;
+import org.streaming.example.infrastructure.processor.JoinProcessor;
 import org.streaming.example.infrastructure.processor.WaveProcessor;
 import org.streaming.example.infrastructure.processor.WaveRekeyProcessor;
+import org.streaming.example.infrastructure.processor.WaveStateStorePopulator;
 import org.streaming.example.infrastructure.processor.WindDirectionProcessor;
 import org.streaming.example.infrastructure.processor.WindDirectionRekeyProcessor;
+import org.streaming.example.infrastructure.processor.WindDirectionStateStorePopulator;
 import org.streaming.example.infrastructure.processor.WindProcessor;
 import org.streaming.example.infrastructure.processor.WindRekeyProcessor;
+import org.streaming.example.infrastructure.processor.WindSpeedStateStorePopulator;
 
 import java.time.Clock;
 import java.util.List;
 
-import static org.streaming.example.infrastructure.KafkaTopologyCustomizer.source;
 import static org.streaming.example.infrastructure.processor.WaveProcessor.WAVE_PROCESSOR_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WaveStateStorePopulator.REKEYED_WAVE_STATE_STORE_NAME;
 import static org.streaming.example.infrastructure.processor.WindDirectionProcessor.WIND_DIRECTION_PROCESSOR_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WindDirectionStateStorePopulator.REKEYED_WIND_DIRECTION_STATE_STORE_NAME;
 import static org.streaming.example.infrastructure.processor.WindProcessor.WIND_PROCESSOR_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WindSpeedStateStorePopulator.REKEYED_WIND_SPEED_STATE_STORE_NAME;
 
 @Component
 public class WeatherTopologyDefinition implements TopologyDefinition {
@@ -75,6 +80,18 @@ public class WeatherTopologyDefinition implements TopologyDefinition {
                 SourceDefinition.newSourceDefinition()
                         .withTopic(kafkaTopicsProperties.getWindDirectionDetected())
                         .withValueDeserializer(avroSerdesFactory.specificAvroValueDeserializer())
+                        .build(),
+                SourceDefinition.newSourceDefinition()
+                        .withTopic(kafkaTopicsProperties.getRekeyedWindDetected())
+                        .withValueDeserializer(avroSerdesFactory.specificAvroValueDeserializer())
+                        .build(),
+                SourceDefinition.newSourceDefinition()
+                        .withTopic(kafkaTopicsProperties.getRekeyedWaveDetected())
+                        .withValueDeserializer(avroSerdesFactory.specificAvroValueDeserializer())
+                        .build(),
+                SourceDefinition.newSourceDefinition()
+                        .withTopic(kafkaTopicsProperties.getRekeyedWindDirectionDetected())
+                        .withValueDeserializer(avroSerdesFactory.specificAvroValueDeserializer())
                         .build()
         );
     }
@@ -111,6 +128,26 @@ public class WeatherTopologyDefinition implements TopologyDefinition {
                         .withName(WindDirectionRekeyProcessor.NAME)
                         .withParents(kafkaTopicsProperties.getWindDirectionDetected())
                         .withProcessorSupplier(() -> new WindDirectionRekeyProcessor(clock, locationKeyMapping))
+                        .build(),
+                ProcessorDefinition.<String, SpecificRecord, String, SpecificRecord>newProcessorDefinition()
+                        .withName(WindSpeedStateStorePopulator.NAME)
+                        .withParents(kafkaTopicsProperties.getRekeyedWindDetected())
+                        .withProcessorSupplier(() -> new WindSpeedStateStorePopulator(clock))
+                        .build(),
+                ProcessorDefinition.<String, SpecificRecord, String, SpecificRecord>newProcessorDefinition()
+                        .withName(WaveStateStorePopulator.NAME)
+                        .withParents(kafkaTopicsProperties.getRekeyedWaveDetected())
+                        .withProcessorSupplier(() -> new WaveStateStorePopulator(clock))
+                        .build(),
+                ProcessorDefinition.<String, SpecificRecord, String, SpecificRecord>newProcessorDefinition()
+                        .withName(WindDirectionStateStorePopulator.NAME)
+                        .withParents(kafkaTopicsProperties.getRekeyedWindDirectionDetected())
+                        .withProcessorSupplier(() -> new WindDirectionStateStorePopulator(clock))
+                        .build(),
+                ProcessorDefinition.<String, SpecificRecord, String, SpecificRecord>newProcessorDefinition()
+                        .withName(JoinProcessor.NAME)
+                        .withParents(WindSpeedStateStorePopulator.NAME, WaveStateStorePopulator.NAME, WindDirectionStateStorePopulator.NAME)
+                        .withProcessorSupplier(() -> new JoinProcessor(clock))
                         .build()
         );
     }
@@ -147,6 +184,11 @@ public class WeatherTopologyDefinition implements TopologyDefinition {
                         .withTopic(kafkaTopicsProperties.getRekeyedWindDirectionDetected())
                         .withParents(WindDirectionRekeyProcessor.NAME)
                         .withValueSerializer(avroSerdesFactory.avroSerializer())
+                        .build(),
+                SinkDefinition.newSinkDefinition()
+                        .withTopic(kafkaTopicsProperties.getKiteWeatherDetected())
+                        .withParents(JoinProcessor.NAME)
+                        .withValueSerializer(avroSerdesFactory.avroSerializer())
                         .build()
         );
     }
@@ -168,6 +210,21 @@ public class WeatherTopologyDefinition implements TopologyDefinition {
                         .withName(WIND_DIRECTION_PROCESSOR_STATE_STORE_NAME)
                         .withProcessors(WindDirectionProcessor.NAME)
                         .withValueSerdes(avroSerdesFactory.rawDataMeasuredSerde())
+                        .build(),
+                StateStoreDefinition.newStateStoreDefinition()
+                        .withName(REKEYED_WIND_SPEED_STATE_STORE_NAME)
+                        .withProcessors(WindSpeedStateStorePopulator.NAME, JoinProcessor.NAME)
+                        .withValueSerdes(avroSerdesFactory.specificSerde())
+                        .build(),
+                StateStoreDefinition.newStateStoreDefinition()
+                        .withName(REKEYED_WAVE_STATE_STORE_NAME)
+                        .withProcessors(WaveStateStorePopulator.NAME, JoinProcessor.NAME)
+                        .withValueSerdes(avroSerdesFactory.specificSerde())
+                        .build(),
+                StateStoreDefinition.newStateStoreDefinition()
+                        .withName(REKEYED_WIND_DIRECTION_STATE_STORE_NAME)
+                        .withProcessors(WindDirectionStateStorePopulator.NAME, JoinProcessor.NAME)
+                        .withValueSerdes(avroSerdesFactory.specificSerde())
                         .build()
         );
     }
