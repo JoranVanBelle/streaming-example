@@ -69,7 +69,7 @@ class WaveProcessorTest {
         rawDataMeasuredTopic.pipeInput(notKiteableWaves2.getSensorId(), notKiteableWaves2);
 
         // then
-        var result = waveTopic.readKeyValuesToList();
+        var result = waveTopic.readRecordsToList();
 
         assertThat(result.size()).isEqualTo(1);
     }
@@ -92,7 +92,7 @@ class WaveProcessorTest {
         rawDataMeasuredTopic.pipeInput(kiteableWaves2.getSensorId(), kiteableWaves2);
 
         // then
-        var result = waveTopic.readKeyValuesToList();
+        var result = waveTopic.readRecordsToList();
 
         assertThat(result.size()).isEqualTo(1);
     }
@@ -115,7 +115,7 @@ class WaveProcessorTest {
         rawDataMeasuredTopic.pipeInput(kiteableWaves.getSensorId(), kiteableWaves);
 
         // then
-        var result = waveTopic.readKeyValuesToList();
+        var result = waveTopic.readRecordsToList();
 
         assertThat(result.size()).isEqualTo(2);
     }
@@ -138,7 +138,7 @@ class WaveProcessorTest {
         rawDataMeasuredTopic.pipeInput(notKiteableWaves.getSensorId(), notKiteableWaves);
 
         // then
-        var result = waveTopic.readKeyValuesToList();
+        var result = waveTopic.readRecordsToList();
 
         assertThat(result.size()).isEqualTo(2);
     }
