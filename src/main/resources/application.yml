@@ -2,8 +2,8 @@ example:
   http:
     meetnet-vlaamse-banken:
       base-url: https://api.meetnetvlaamsebanken.be
-      username: joran.vanbelle2@student.hogent.be
-      password: LMsQ%25!fVp3DmrYe76Z*H
+      username: ${email:unknown}
+      password: ${password:unknown}
       sensor-ids:
         - NP7WRS  # Average wind direction
         - NPBGH1  # 10% highest waves
