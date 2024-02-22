@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.streaming.example.KiteableWaveDetected;
 import org.streaming.example.KiteableWeatherDetected;
 import org.streaming.example.KiteableWindDetected;
@@ -29,7 +30,7 @@ import org.streaming.example.mothers.UnkiteableWaveDetectedMother;
 import org.streaming.example.mothers.UnkiteableWindDirectionDetectedMother;
 import org.streaming.example.mothers.UnkiteableWindSpeedDetectedMother;
 
-import java.util.UUID;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TopologyTest
 public class JoinProcessorTest {
@@ -119,17 +120,73 @@ public class JoinProcessorTest {
             windDirectionRekeyTopic.pipeInput(kiteableWindDirectionDetected.getSensorId(), kiteableWindDirectionDetected);
 
             // then
-            var result = weatherTopic.readKeyValuesToList();
-            result.getFirst().equals(new KiteableWeatherDetected(
-                    "Nieuwpoort",
-                    "Nieuwpoort",
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+            var result = weatherTopic.readValuesToList();
+            assertThat(result).contains(new KiteableWeatherDetected(
+                    "Nieuwpoort - Buoy",
+                    "Nieuwpoort - Buoy",
+                    "1000",
+                    "m/s",
+                    "39.0",
+                    "cm",
+                    "270",
+                    "deg"
             ));
         }
+    }
+
+    @Test
+    void givenKiteableWeather_whenWavesBecomeUnkiteable_weatherShouldBeUpdated() {
+        // given
+        var kiteableWaveDetected = KiteableWaveDetectedMother.newEvent()
+                .withSensorId("LocationX")
+                .withLocation("LocationX")
+                .buildEvent();
+
+        var kiteableWindDetected = KiteableWindSpeedDetectedMother.newEvent()
+                .withSensorId("LocationX")
+                .withLocation("LocationX")
+                .buildEvent();
+
+        var kiteableWindDirectionDetected = KiteableWindDirectionDetectedMother.newEvent()
+                .withSensorId("LocationX")
+                .withLocation("LocationX")
+                .buildEvent();
+
+        var unkiteableWaveDetected = UnkiteableWaveDetectedMother.newEvent()
+                .withSensorId("LocationX")
+                .withLocation("LocationX")
+                .buildEvent();
+
+        // when
+        waveRekeyTopic.pipeInput(kiteableWaveDetected.getSensorId(), kiteableWaveDetected);
+        windRekeyTopic.pipeInput(kiteableWindDetected.getSensorId(), kiteableWindDetected);
+        windDirectionRekeyTopic.pipeInput(kiteableWindDirectionDetected.getSensorId(), kiteableWindDirectionDetected);
+
+        // then
+        var result = weatherTopic.readValuesToList();
+
+        assertThat(result).contains(new KiteableWeatherDetected(
+                "LocationX",
+                "LocationX",
+                "1000",
+                "m/s",
+                "39.0",
+                "cm",
+                "270",
+                "deg"
+        ));
+
+        waveRekeyTopic.pipeInput(unkiteableWaveDetected.getSensorId(), unkiteableWaveDetected);
+
+        assertThat(result).contains(new KiteableWeatherDetected(
+                "LocationX",
+                "LocationX",
+                "1000",
+                "m/s",
+                "39.0",
+                "cm",
+                "270",
+                "deg"
+        ));
     }
 }

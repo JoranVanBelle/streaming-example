@@ -15,8 +15,6 @@ import org.streaming.example.UnkiteableWindDetected;
 import java.time.Clock;
 import java.time.Instant;
 
-import static java.lang.Math.round;
-
 public class WindProcessor implements Processor<String, RawDataMeasured, String, SpecificRecord> {
 
     private final Logger logger = LoggerFactory.getLogger(WindProcessor.class.getSimpleName());

@@ -1,7 +1,6 @@
 package org.streaming.example.adapter.kafka;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -38,10 +37,10 @@ public class WeatherPublisher {
         this.kafkaTopicsProperties = kafkaTopicsProperties;
     }
 
-    @Scheduled(fixedDelay = 3600_000)
+    @Scheduled(fixedDelayString = "${example.http.meetnet-vlaamse-banken.poll-interval}")
     public void publish() {
-        var data = meetnetVlaamseBankenController.findData();
         var catalog = meetnetVlaamseBankenController.findCatalogData();
+        var data = meetnetVlaamseBankenController.findData();
 
         for (var sensorId : meetnetVlaamseBankenProperties.getSensorIds()) {
             var sensorData = getSensorData(data, sensorId);

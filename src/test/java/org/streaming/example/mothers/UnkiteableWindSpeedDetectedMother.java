@@ -1,6 +1,5 @@
 package org.streaming.example.mothers;
 
-import org.streaming.example.KiteableWindDetected;
 import org.streaming.example.UnkiteableWindDetected;
 
 public class UnkiteableWindSpeedDetectedMother {

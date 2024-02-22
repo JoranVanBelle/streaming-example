@@ -1,0 +1,8 @@
+{
+  ".expires": "Thu, 22 Feb 2024 18:40:29 GMT",
+  ".issued": "Thu, 22 Feb 2024 17:40:29 GMT",
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImlwZDdwZU80OXAwN1V6WjBxenUwY2h4Vk9lOCIsImtpZCI6ImlwZDdwZU80OXAwN1V6WjBxenUwY2h4Vk9lOCJ9.access-token",
+  "expires_in": 3600,
+  "token_type": "Bearer",
+  "userName": "joran.vanbelle2@student.hogent.be"
+}

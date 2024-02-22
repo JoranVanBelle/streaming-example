@@ -63,33 +63,27 @@ public class JoinProcessor implements Processor<String, SpecificRecord, String, 
                 var kiteableWeather = new KiteableWeatherDetected(
                         kiteableWaveDetected.getLocation(),
                         kiteableWaveDetected.getLocation(),
-                        kiteableWaveDetected.getValue(),
-                        kiteableWaveDetected.getUnit(),
                         kiteableWindDetected.getValue(),
                         kiteableWindDetected.getUnit(),
+                        kiteableWaveDetected.getValue(),
+                        kiteableWaveDetected.getUnit(),
                         kiteableWindDirectionDetected.getValue(),
                         kiteableWindDirectionDetected.getUnit()
                 );
                 logger.info("Kiteable weather detected: %s".formatted(kiteableWeather));
-                waveKeyValueStore.delete(key);
-                windSpeedKeyValueStore.delete(key);
-                windDirectionKeyValueStore.delete(key);
                 context.forward(new Record<>(kiteableWeather.getDataId(), kiteableWeather, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
             } else {
                 var unkiteableWeather = new NoKiteableWeatherDetected(
                         kiteableWaveDetected != null ? kiteableWaveDetected.getLocation() : unkiteableWaveDetected.getLocation(),
                         kiteableWaveDetected != null ? kiteableWaveDetected.getLocation() : unkiteableWaveDetected.getLocation(),
-                        kiteableWaveDetected != null ? kiteableWaveDetected.getValue() : unkiteableWaveDetected.getValue(),
-                        kiteableWaveDetected != null ? kiteableWaveDetected.getUnit() : unkiteableWaveDetected.getUnit(),
                         kiteableWindDetected != null ? kiteableWindDetected.getValue() : unkiteableWindDetected.getValue(),
                         kiteableWindDetected != null ? kiteableWindDetected.getUnit() : unkiteableWindDetected.getUnit(),
+                        kiteableWaveDetected != null ? kiteableWaveDetected.getValue() : unkiteableWaveDetected.getValue(),
+                        kiteableWaveDetected != null ? kiteableWaveDetected.getUnit() : unkiteableWaveDetected.getUnit(),
                         kiteableWindDirectionDetected != null ? kiteableWindDirectionDetected.getValue() : unkiteableWindDirectionDetected.getValue(),
                         kiteableWindDirectionDetected != null ? kiteableWindDirectionDetected.getUnit() : unkiteableWindDirectionDetected.getUnit()
                         );
                 logger.info("Unkiteable weather detected: %s".formatted(unkiteableWeather));
-                waveKeyValueStore.delete(key);
-                windSpeedKeyValueStore.delete(key);
-                windDirectionKeyValueStore.delete(key);
                 context.forward(new Record<>(unkiteableWeather.getDataId(), unkiteableWeather, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
             }
 

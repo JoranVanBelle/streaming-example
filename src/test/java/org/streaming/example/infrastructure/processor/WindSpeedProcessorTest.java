@@ -11,16 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.streaming.example.KiteableWindDetected;
-import org.streaming.example.UnkiteableWaveDetected;
 import org.streaming.example.UnkiteableWindDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
 import org.streaming.example.domain.TopologyTest;
-import org.streaming.example.mothers.RawWaveHeightMeasured;
 import org.streaming.example.mothers.RawWindSpeedMeasured;
 
-import java.time.Duration;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;

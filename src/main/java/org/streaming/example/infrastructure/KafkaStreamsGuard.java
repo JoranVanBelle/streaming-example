@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.kafka.StreamsBuilderFactoryBeanCus
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafkaStreams;
 
 import static org.apache.kafka.streams.KafkaStreams.State.ERROR;
 

@@ -1,16 +1,22 @@
 example:
   http:
     meetnet-vlaamse-banken:
+      poll-interval: 3600_000
       base-url: https://api.meetnetvlaamsebanken.be
-      username: ${email:unknown}
-      password: ${password:unknown}
+      username: unkown
+      password: unkown
       sensor-ids:
         - NP7WRS  # Average wind direction
         - NPBGH1  # 10% highest waves
         - NP7WVC  # Average wind speed (at 10 m height)
+        - ZDIWRS
+        - ZOKGH1
+        - ZDIWVC
       location-key:
         mapping:
           NP: Nieuwpoort
+          ZDI: Zeebrugge
+          ZOK: Zeebrugge
   weather:
     wind-speed: 10
     wave-height: 30
@@ -34,6 +40,9 @@ spring:
     compose:
       enabled: false
 
+  flyway:
+    baseline-on-migrate: true
+
   kafka:
     consumer:
       keyDeserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -53,7 +62,7 @@ spring:
 
     properties:
       specific.avro.reader: true
-      allow.auto.create.topics: false
+      allow.auto.create.topics: true
       auto.register.schemas: true
       value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
 

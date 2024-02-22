@@ -11,13 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.streaming.example.KiteableWindDirectionDetected;
-import org.streaming.example.UnkiteableWaveDetected;
 import org.streaming.example.UnkiteableWindDirectionDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
 import org.streaming.example.domain.TopologyTest;
-import org.streaming.example.mothers.RawWindDirectionMeasured;
 import org.streaming.example.mothers.RawWindDirectionMeasured;
 
 import java.util.UUID;

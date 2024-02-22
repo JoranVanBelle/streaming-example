@@ -32,8 +32,6 @@ public class MeetnetVlaamseBankenController {
         this.restTemplate = restTemplate;
     }
 
-    // TODO - method that call findData and findCatalogData and merge them together. Create event per location
-
     public String token() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_FORM_URLENCODED);

@@ -3,7 +3,6 @@ package org.streaming.example.infrastructure;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.autoconfigure.kafka.StreamsBuilderFactoryBeanCustomizer;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;

@@ -16,7 +16,6 @@ import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
 import org.streaming.example.domain.TopologyTest;
 import org.streaming.example.mothers.KiteableWaveDetectedMother;
-import org.streaming.example.mothers.RawWaveHeightMeasured;
 
 import java.util.UUID;
 

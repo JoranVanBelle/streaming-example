@@ -5,7 +5,8 @@ import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.processor.api.ProcessorContext;
 import org.apache.kafka.streams.processor.api.Record;
-import org.streaming.example.RawDataMeasured;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.streaming.example.domain.meetnetvlaamsebanken.LocationKeyMapping;
 
 import java.time.Clock;
@@ -13,6 +14,8 @@ import java.time.Instant;
 import java.util.Map;
 
 public class WaveRekeyProcessor implements Processor<String, SpecificRecord, String, SpecificRecord> {
+
+    private final Logger logger = LoggerFactory.getLogger(WaveRekeyProcessor.class.getSimpleName());
 
     public static final String NAME = WaveRekeyProcessor.class.getSimpleName();
     private final LocationKeyMapping locationKeyMapping;
@@ -31,6 +34,7 @@ public class WaveRekeyProcessor implements Processor<String, SpecificRecord, Str
 
     @Override
     public void process(Record<String, SpecificRecord> record) {
+        logger.info("rekeying key: " + record.key());
         final String newKey = getNewKey(record.key());
         context.forward(new Record<>(newKey, record.value(), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
     }

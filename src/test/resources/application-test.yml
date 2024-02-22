@@ -1,9 +1,23 @@
+example:
+  http:
+    meetnet-vlaamse-banken:
+      username: ${email:unknown}
+      password: ${password:unknown}
+
 spring:
+  datasource:
+    url: jdbc:tc:postgresql:16.1:///COMPLIANCE?TC_REUSABLE=true
+    username: username
+    password: password
   kafka:
     bootstrap-servers: localhost:9092
     streams:
       application-id: ${random.uuid}
       client-id: ${random.uuid}
+
+    consumer:
+      groupId: ${random.uuid}
+      clientId: ${random.uuid}
 
     properties:
       schema.registry.url: mock://schema-registry

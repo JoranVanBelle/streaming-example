@@ -1,3 +1,8 @@
+example:
+    http:
+      meetnet-vlaamse-banken:
+        poll-interval: 5_000
+
 spring:
   docker:
     compose:

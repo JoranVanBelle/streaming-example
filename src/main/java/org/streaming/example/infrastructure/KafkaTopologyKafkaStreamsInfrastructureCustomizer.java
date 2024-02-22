@@ -6,20 +6,18 @@ import org.apache.kafka.streams.Topology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.config.KafkaStreamsInfrastructureCustomizer;
-import org.streaming.example.domain.kafka.ProcessorDefinition;
-import org.streaming.example.domain.kafka.SourceDefinition;
 import org.streaming.example.domain.kafka.TopologyDefinition;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class KafkaTopologyCustomizer implements KafkaStreamsInfrastructureCustomizer {
+public class KafkaTopologyKafkaStreamsInfrastructureCustomizer implements KafkaStreamsInfrastructureCustomizer {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaTopologyCustomizer.class.getSimpleName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaTopologyKafkaStreamsInfrastructureCustomizer.class.getSimpleName());
 
     private final List<TopologyDefinition> topologyDefinitions;
 
-    public KafkaTopologyCustomizer(List<TopologyDefinition> topologyDefinitions) {
+    public KafkaTopologyKafkaStreamsInfrastructureCustomizer(List<TopologyDefinition> topologyDefinitions) {
         this.topologyDefinitions = topologyDefinitions;
     }
 
