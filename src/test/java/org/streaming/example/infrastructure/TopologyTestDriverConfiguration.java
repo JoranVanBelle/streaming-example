@@ -24,6 +24,11 @@ public class TopologyTestDriverConfiguration {
         this.kafkaProperties = kafkaProperties;
     }
 
+    /**
+     * To create a topologyTestDriver so that the topology can be tested
+     * @param infrastructureCustomizerProvider
+     * @return a bean of a TopologyTestDriver
+     */
     @Bean
     @DependsOn("streamsInfrastructureCustomizer")
     TopologyTestDriver defaultTopologyTestDriver(

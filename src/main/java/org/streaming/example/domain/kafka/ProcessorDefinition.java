@@ -4,6 +4,13 @@ import org.apache.kafka.streams.processor.api.ProcessorSupplier;
 
 import java.util.List;
 
+/**
+ * A builder used to create Processor-nodes in the topology
+ * @param <KIn> Key record in
+ * @param <VIn> Value record in
+ * @param <KOut> Key record out
+ * @param <VOut> Value record out
+ */
 public class ProcessorDefinition<KIn, VIn, KOut, VOut> {
 
     private final String name;

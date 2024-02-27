@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A mock version of a database
+ */
 @Primary
 @Repository
 @Profile({ "test" })

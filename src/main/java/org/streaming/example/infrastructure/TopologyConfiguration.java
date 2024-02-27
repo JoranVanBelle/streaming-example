@@ -8,8 +8,10 @@ import org.streaming.example.domain.kafka.TopologyDefinition;
 
 import java.util.List;
 
+/**
+ * Will customize the topologies
+ */
 @Configuration
-//@EnableKafkaStreams
 public class TopologyConfiguration {
 
     @Bean

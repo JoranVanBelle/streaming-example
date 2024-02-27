@@ -11,6 +11,9 @@ import java.util.concurrent.ExecutionException;
 
 import static org.apache.kafka.clients.admin.AdminClient.create;
 
+/**
+ * used to create the topics before starting the application
+ */
 @Configuration
 public class TopologyTopicCreationStreamsBuilderFactoryBeanCustomizer implements StreamsBuilderFactoryBeanCustomizer {
 

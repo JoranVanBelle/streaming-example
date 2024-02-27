@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Clock;
 import java.time.ZoneId;
 
+/**
+ * To fix the clock on a certain timezome
+ */
 @Configuration
 public class ClockConfiguration {
 

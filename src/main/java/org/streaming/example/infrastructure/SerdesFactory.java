@@ -18,6 +18,9 @@ import org.streaming.example.domain.AvroSerdesFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Creates serializers and deserializers
+ */
 @Component
 public class SerdesFactory implements AvroSerdesFactory {
 

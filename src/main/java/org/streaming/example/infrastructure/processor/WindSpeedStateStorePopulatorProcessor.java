@@ -10,23 +10,23 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import java.time.Clock;
 import java.time.Instant;
 
-public class WaveStateStorePopulator implements Processor<String, SpecificRecord, String, SpecificRecord> {
+public class WindSpeedStateStorePopulatorProcessor implements Processor<String, SpecificRecord, String, SpecificRecord> {
 
-    public static final String REKEYED_WAVE_STATE_STORE_NAME = "WaveStateStorePopulatorStateStore";
-    public static final String NAME = WaveStateStorePopulator.class.getSimpleName();
+    public static final String REKEYED_WIND_SPEED_STATE_STORE_NAME = "WindSpeedStateStorePopulatorStateStore";
+    public static final String NAME = WindSpeedStateStorePopulatorProcessor.class.getSimpleName();
     private final Clock clock;
 
     private ProcessorContext<String, SpecificRecord> context;
     private KeyValueStore<String, SpecificRecord> keyValueStore;
 
-    public WaveStateStorePopulator(Clock clock) {
+    public WindSpeedStateStorePopulatorProcessor(Clock clock) {
         this.clock = clock;
     }
 
     @Override
     public void init(ProcessorContext<String, SpecificRecord> context) {
         this.context = context;
-        keyValueStore = context.getStateStore(REKEYED_WAVE_STATE_STORE_NAME);
+        keyValueStore = context.getStateStore(REKEYED_WIND_SPEED_STATE_STORE_NAME);
     }
 
     @Override

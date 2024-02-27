@@ -10,6 +10,9 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.streaming.example.domain.AvroSerdesFactory;
 
+/**
+ * Used so that kafkaTemplates uses the correct schema's
+ */
 @Configuration
 public class AvroSerdesCustomizer {
 

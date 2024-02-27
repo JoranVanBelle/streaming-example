@@ -9,6 +9,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
+/**
+ * Exposes a {@link org.streaming.example.domain.MutableClock} that can be used to create tests
+ */
 @Configuration
 public class TestClockConfiguration {
 

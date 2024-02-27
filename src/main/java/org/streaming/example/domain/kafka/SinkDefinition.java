@@ -5,6 +5,9 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.List;
 
+/**
+ * A builder used to create Sink-nodes in the topology
+ */
 public class SinkDefinition {
 
     private final Serializer<?> valueSerializer;

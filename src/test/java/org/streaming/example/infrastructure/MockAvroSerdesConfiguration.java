@@ -17,6 +17,9 @@ import org.streaming.example.domain.AvroSerdesFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Used for mocking the schema registry
+ */
 @Primary
 @Component
 @Profile({ "test" })

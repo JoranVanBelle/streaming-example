@@ -8,6 +8,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.StringJoiner;
 
+/**
+ * The weatherObject in the database that is also returned via the controller
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherEntity implements Comparable<WeatherEntity> {
 

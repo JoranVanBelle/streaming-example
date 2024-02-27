@@ -10,6 +10,9 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 
+/**
+ * Creates the topics for the integration test
+ */
 @Profile("it-test")
 @Configuration
 public class TopicConfiguration {

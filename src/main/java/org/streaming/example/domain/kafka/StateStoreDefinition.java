@@ -9,6 +9,9 @@ import java.util.List;
 import static org.apache.kafka.streams.state.Stores.keyValueStoreBuilder;
 import static org.apache.kafka.streams.state.Stores.persistentKeyValueStore;
 
+/**
+ * A builder used to create state stores
+ */
 public class StateStoreDefinition {
     private final String name;
     private final String[] processors;

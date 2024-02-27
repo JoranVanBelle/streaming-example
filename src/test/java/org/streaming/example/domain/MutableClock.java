@@ -6,6 +6,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAmount;
 
+/**
+ * A Mutable clock that can be used during testing
+ */
 public class MutableClock extends Clock {
 
     private Instant instant;

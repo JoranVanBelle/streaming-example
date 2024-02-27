@@ -20,9 +20,9 @@ import org.streaming.example.UnkiteableWindDirectionDetected;
 import java.time.Clock;
 import java.time.Instant;
 
-import static org.streaming.example.infrastructure.processor.WaveStateStorePopulator.REKEYED_WAVE_STATE_STORE_NAME;
-import static org.streaming.example.infrastructure.processor.WindDirectionStateStorePopulator.REKEYED_WIND_DIRECTION_STATE_STORE_NAME;
-import static org.streaming.example.infrastructure.processor.WindSpeedStateStorePopulator.REKEYED_WIND_SPEED_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WaveStateStorePopulatorProcessor.REKEYED_WAVE_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WindDirectionStateStorePopulatorProcessor.REKEYED_WIND_DIRECTION_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WindSpeedStateStorePopulatorProcessor.REKEYED_WIND_SPEED_STATE_STORE_NAME;
 
 public class JoinProcessor implements Processor<String, SpecificRecord, String, SpecificRecord> {
     private final Logger logger = LoggerFactory.getLogger(JoinProcessor.class.getSimpleName());

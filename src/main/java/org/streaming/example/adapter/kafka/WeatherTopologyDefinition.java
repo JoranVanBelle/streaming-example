@@ -14,23 +14,23 @@ import org.streaming.example.domain.meetnetvlaamsebanken.LocationKeyMapping;
 import org.streaming.example.infrastructure.processor.JoinProcessor;
 import org.streaming.example.infrastructure.processor.WaveProcessor;
 import org.streaming.example.infrastructure.processor.WaveRekeyProcessor;
-import org.streaming.example.infrastructure.processor.WaveStateStorePopulator;
+import org.streaming.example.infrastructure.processor.WaveStateStorePopulatorProcessor;
 import org.streaming.example.infrastructure.processor.WindDirectionProcessor;
 import org.streaming.example.infrastructure.processor.WindDirectionRekeyProcessor;
-import org.streaming.example.infrastructure.processor.WindDirectionStateStorePopulator;
+import org.streaming.example.infrastructure.processor.WindDirectionStateStorePopulatorProcessor;
 import org.streaming.example.infrastructure.processor.WindProcessor;
 import org.streaming.example.infrastructure.processor.WindRekeyProcessor;
-import org.streaming.example.infrastructure.processor.WindSpeedStateStorePopulator;
+import org.streaming.example.infrastructure.processor.WindSpeedStateStorePopulatorProcessor;
 
 import java.time.Clock;
 import java.util.List;
 
 import static org.streaming.example.infrastructure.processor.WaveProcessor.WAVE_PROCESSOR_STATE_STORE_NAME;
-import static org.streaming.example.infrastructure.processor.WaveStateStorePopulator.REKEYED_WAVE_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WaveStateStorePopulatorProcessor.REKEYED_WAVE_STATE_STORE_NAME;
 import static org.streaming.example.infrastructure.processor.WindDirectionProcessor.WIND_DIRECTION_PROCESSOR_STATE_STORE_NAME;
-import static org.streaming.example.infrastructure.processor.WindDirectionStateStorePopulator.REKEYED_WIND_DIRECTION_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WindDirectionStateStorePopulatorProcessor.REKEYED_WIND_DIRECTION_STATE_STORE_NAME;
 import static org.streaming.example.infrastructure.processor.WindProcessor.WIND_PROCESSOR_STATE_STORE_NAME;
-import static org.streaming.example.infrastructure.processor.WindSpeedStateStorePopulator.REKEYED_WIND_SPEED_STATE_STORE_NAME;
+import static org.streaming.example.infrastructure.processor.WindSpeedStateStorePopulatorProcessor.REKEYED_WIND_SPEED_STATE_STORE_NAME;
 
 @Component
 public class WeatherTopologyDefinition implements TopologyDefinition {
@@ -130,23 +130,23 @@ public class WeatherTopologyDefinition implements TopologyDefinition {
                         .withProcessorSupplier(() -> new WindDirectionRekeyProcessor(clock, locationKeyMapping))
                         .build(),
                 ProcessorDefinition.<String, SpecificRecord, String, SpecificRecord>newProcessorDefinition()
-                        .withName(WindSpeedStateStorePopulator.NAME)
+                        .withName(WindSpeedStateStorePopulatorProcessor.NAME)
                         .withParents(kafkaTopicsProperties.getRekeyedWindDetected())
-                        .withProcessorSupplier(() -> new WindSpeedStateStorePopulator(clock))
+                        .withProcessorSupplier(() -> new WindSpeedStateStorePopulatorProcessor(clock))
                         .build(),
                 ProcessorDefinition.<String, SpecificRecord, String, SpecificRecord>newProcessorDefinition()
-                        .withName(WaveStateStorePopulator.NAME)
+                        .withName(WaveStateStorePopulatorProcessor.NAME)
                         .withParents(kafkaTopicsProperties.getRekeyedWaveDetected())
-                        .withProcessorSupplier(() -> new WaveStateStorePopulator(clock))
+                        .withProcessorSupplier(() -> new WaveStateStorePopulatorProcessor(clock))
                         .build(),
                 ProcessorDefinition.<String, SpecificRecord, String, SpecificRecord>newProcessorDefinition()
-                        .withName(WindDirectionStateStorePopulator.NAME)
+                        .withName(WindDirectionStateStorePopulatorProcessor.NAME)
                         .withParents(kafkaTopicsProperties.getRekeyedWindDirectionDetected())
-                        .withProcessorSupplier(() -> new WindDirectionStateStorePopulator(clock))
+                        .withProcessorSupplier(() -> new WindDirectionStateStorePopulatorProcessor(clock))
                         .build(),
                 ProcessorDefinition.<String, SpecificRecord, String, SpecificRecord>newProcessorDefinition()
                         .withName(JoinProcessor.NAME)
-                        .withParents(WindSpeedStateStorePopulator.NAME, WaveStateStorePopulator.NAME, WindDirectionStateStorePopulator.NAME)
+                        .withParents(WindSpeedStateStorePopulatorProcessor.NAME, WaveStateStorePopulatorProcessor.NAME, WindDirectionStateStorePopulatorProcessor.NAME)
                         .withProcessorSupplier(() -> new JoinProcessor(clock))
                         .build()
         );
@@ -213,17 +213,17 @@ public class WeatherTopologyDefinition implements TopologyDefinition {
                         .build(),
                 StateStoreDefinition.newStateStoreDefinition()
                         .withName(REKEYED_WIND_SPEED_STATE_STORE_NAME)
-                        .withProcessors(WindSpeedStateStorePopulator.NAME, JoinProcessor.NAME)
+                        .withProcessors(WindSpeedStateStorePopulatorProcessor.NAME, JoinProcessor.NAME)
                         .withValueSerdes(avroSerdesFactory.specificSerde())
                         .build(),
                 StateStoreDefinition.newStateStoreDefinition()
                         .withName(REKEYED_WAVE_STATE_STORE_NAME)
-                        .withProcessors(WaveStateStorePopulator.NAME, JoinProcessor.NAME)
+                        .withProcessors(WaveStateStorePopulatorProcessor.NAME, JoinProcessor.NAME)
                         .withValueSerdes(avroSerdesFactory.specificSerde())
                         .build(),
                 StateStoreDefinition.newStateStoreDefinition()
                         .withName(REKEYED_WIND_DIRECTION_STATE_STORE_NAME)
-                        .withProcessors(WindDirectionStateStorePopulator.NAME, JoinProcessor.NAME)
+                        .withProcessors(WindDirectionStateStorePopulatorProcessor.NAME, JoinProcessor.NAME)
                         .withValueSerdes(avroSerdesFactory.specificSerde())
                         .build()
         );

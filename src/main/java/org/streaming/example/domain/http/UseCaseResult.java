@@ -6,6 +6,12 @@ import org.streaming.example.domain.WeatherEntity;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The result of a use case
+ * @param status
+ * @param data
+ * @param <Data>
+ */
 public record UseCaseResult<Data>(
         ResponseEntityStatus status,
         @JsonProperty("weather")

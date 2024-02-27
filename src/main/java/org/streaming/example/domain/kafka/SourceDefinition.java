@@ -3,6 +3,9 @@ package org.streaming.example.domain.kafka;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
+/**
+ * A builder used to create Source-nodes in the topology
+ */
 public class SourceDefinition {
 
     private final Deserializer<?> valueDeserializer;
