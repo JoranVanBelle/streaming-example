@@ -1,6 +1,6 @@
 package org.streaming.example.mothers;
 
-import org.streaming.example.UnkiteableWaveDetected;
+import org.streaming.example.adapter.events.UnkiteableWaveDetected;
 
 public class UnkiteableWaveDetectedMother {
 

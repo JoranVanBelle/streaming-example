@@ -1,6 +1,11 @@
 # TODO
 
-- [ ] : save in db + endpoint
+
+- [x] : save in db + endpoint
 - [x] : java docs in the project
+- [x] : make one schema per topic instead of multiple schema's per topic
+
 - [ ] : random events - feedback (toggleable)
-- [ ] : make one schema per topic instead of multiple schema's per topic
+- [ ] : make a UI
+- [ ] : readme
+- [ ] : document yml-properties

@@ -8,20 +8,21 @@ import org.apache.kafka.streams.processor.api.Record;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.streaming.example.KiteableWindDirectionDetected;
-import org.streaming.example.RawDataMeasured;
-import org.streaming.example.UnkiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.KiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.RawDataMeasured;
+import org.streaming.example.adapter.events.UnkiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.WindDirectionDetected;
 
 import java.time.Clock;
 import java.time.Instant;
 
-public class WindDirectionProcessor implements Processor<String, RawDataMeasured, String, SpecificRecord> {
+public class WindDirectionProcessor implements Processor<String, RawDataMeasured, String, WindDirectionDetected> {
 
     private final Logger logger = LoggerFactory.getLogger(WindDirectionProcessor.class.getSimpleName());
     public static final String WIND_DIRECTION_PROCESSOR_STATE_STORE_NAME = "WindDirectionProcessorStateStore";
     public static final String NAME = WindDirectionProcessor.class.getSimpleName();
     private static final String WIND_DIRECTION_SENSOR_ID = "WRS";
-    private ProcessorContext<String, SpecificRecord> context;
+    private ProcessorContext<String, WindDirectionDetected> context;
     private KeyValueStore<String, RawDataMeasured> keyValueStore;
     private final Clock clock;
     private final double fromTresholdWindDirection;
@@ -35,7 +36,7 @@ public class WindDirectionProcessor implements Processor<String, RawDataMeasured
     }
 
     @Override
-    public void init(ProcessorContext<String, SpecificRecord> context) {
+    public void init(ProcessorContext<String, WindDirectionDetected> context) {
         this.context = context;
         keyValueStore = context.getStateStore(WIND_DIRECTION_PROCESSOR_STATE_STORE_NAME);
     }
@@ -64,15 +65,15 @@ public class WindDirectionProcessor implements Processor<String, RawDataMeasured
                         return;
                     } else {
                         keyValueStore.put(event.key(), event.value());
-                        var notKiteableWind = mapToNotKiteableWindDirectionDetected(event.value());
-                        context.forward(new Record<>(notKiteableWind.getSensorId(), notKiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                        var notKiteableWindDirection = mapToNotKiteableWindDirectionDetected(event.value());
+                        context.forward(new Record<>(notKiteableWindDirection.getSensorId(), new WindDirectionDetected(notKiteableWindDirection), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                     }
                 } else {
                     // not kiteable - old
                     if (windDirectionIsKiteable(newValue)) {
                         keyValueStore.put(event.key(), event.value());
-                        var kiteableWind = mapToKiteableWindDirectionDetected(event.value());
-                        context.forward(new Record<>(kiteableWind.getSensorId(), kiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                        var kiteableWindDirection = mapToKiteableWindDirectionDetected(event.value());
+                        context.forward(new Record<>(kiteableWindDirection.getSensorId(), new WindDirectionDetected(kiteableWindDirection), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                     } else {
                         return;
                     }
@@ -80,11 +81,11 @@ public class WindDirectionProcessor implements Processor<String, RawDataMeasured
             } else {
                 keyValueStore.put(event.key(), event.value());
                 if (windDirectionIsKiteable(newValue)) {
-                    var kiteableWind = mapToKiteableWindDirectionDetected(event.value());
-                    context.forward(new Record<>(kiteableWind.getSensorId(), kiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                    var kiteableWindDirection = mapToKiteableWindDirectionDetected(event.value());
+                    context.forward(new Record<>(kiteableWindDirection.getSensorId(), new WindDirectionDetected(kiteableWindDirection), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                 } else {
-                    var notKiteableWind = mapToNotKiteableWindDirectionDetected(event.value());
-                    context.forward(new Record<>(notKiteableWind.getSensorId(), notKiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                    var notKiteableWindDirection = mapToNotKiteableWindDirectionDetected(event.value());
+                    context.forward(new Record<>(notKiteableWindDirection.getSensorId(), new WindDirectionDetected(notKiteableWindDirection), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                 }
             }
         }

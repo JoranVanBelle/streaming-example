@@ -1,7 +1,6 @@
 package org.streaming.example.adapter.kafka;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -5,7 +5,6 @@ import org.streaming.example.adapter.http.feedback.Feedback;
 import org.streaming.example.domain.FeedbackRepository;
 import org.streaming.example.domain.http.UseCaseResult;
 
-import static org.streaming.example.domain.http.ResponseEntityStatus.fail;
 import static org.streaming.example.domain.http.ResponseEntityStatus.notFound;
 import static org.streaming.example.domain.http.ResponseEntityStatus.success;
 

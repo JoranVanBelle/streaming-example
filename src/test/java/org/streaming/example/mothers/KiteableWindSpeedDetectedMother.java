@@ -1,6 +1,7 @@
 package org.streaming.example.mothers;
 
-import org.streaming.example.KiteableWindDetected;
+
+import org.streaming.example.adapter.events.KiteableWindSpeedDetected;
 
 public class KiteableWindSpeedDetectedMother {
     private String sensorId;
@@ -74,8 +75,8 @@ public class KiteableWindSpeedDetectedMother {
             return this;
         }
 
-        public KiteableWindDetected buildEvent() {
-            return KiteableWindDetected.newBuilder()
+        public KiteableWindSpeedDetected buildEvent() {
+            return KiteableWindSpeedDetected.newBuilder()
                     .setSensorId(sensorId)
                     .setLocation(location)
                     .setValue(value)

@@ -10,7 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.streaming.example.KiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.KiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.WindDirectionDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
@@ -62,7 +63,7 @@ public class WindDirectionRekeyProcessorTest extends KafkaContainerSupport {
                 .buildEvent();
 
         // when
-        windDirectionTopic.pipeInput(kiteableWind.getSensorId(), kiteableWind);
+        windDirectionTopic.pipeInput(kiteableWind.getSensorId(), new WindDirectionDetected(kiteableWind));
 
         // then
         var result = windDirectionRekeyTopic.readKeyValuesToList();
@@ -79,17 +80,20 @@ public class WindDirectionRekeyProcessorTest extends KafkaContainerSupport {
                 .buildEvent();
 
         // when
-        windDirectionTopic.pipeInput(kiteableWind.getSensorId(), kiteableWind);
+        windDirectionTopic.pipeInput(kiteableWind.getSensorId(), new WindDirectionDetected(kiteableWind));
 
         // then
         var result = windDirectionRekeyTopic.readKeyValuesToList();
 
-        assertThat(result.getLast().value).isEqualTo(new KiteableWindDirectionDetected(
+        assertThat(result.getLast().value).isEqualTo(
+            new WindDirectionDetected(
+                new KiteableWindDirectionDetected(
                 "NP-%s-WRS".formatted(key),
                 "Nieuwpoort - Wind measurement",
                 "270",
                 "deg",
                 "Average wind direction"
+                )
         ));
     }
 }

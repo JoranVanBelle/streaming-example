@@ -10,7 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.streaming.example.KiteableWaveDetected;
+import org.streaming.example.adapter.events.KiteableWaveDetected;
+import org.streaming.example.adapter.events.WaveDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
@@ -62,7 +63,7 @@ class WaveRekeyProcessorTest extends KafkaContainerSupport {
                 .buildEvent();
 
         // when
-        waveTopic.pipeInput(kiteableWaves.getSensorId(), kiteableWaves);
+        waveTopic.pipeInput(kiteableWaves.getSensorId(), new WaveDetected(kiteableWaves));
 
         // then
         var result = waveRekeyTopic.readRecordsToList();
@@ -79,17 +80,20 @@ class WaveRekeyProcessorTest extends KafkaContainerSupport {
                 .buildEvent();
 
         // when
-        waveTopic.pipeInput(kiteableWaves.getSensorId(), kiteableWaves);
+        waveTopic.pipeInput(kiteableWaves.getSensorId(), new WaveDetected(kiteableWaves));
 
         // then
         var result = waveRekeyTopic.readRecordsToList();
 
-        assertThat(result.getLast().value()).isEqualTo(new KiteableWaveDetected(
+        assertThat(result.getLast().value()).isEqualTo(
+            new WaveDetected(
+                new KiteableWaveDetected(
                 "NP-%s-GH1".formatted(key),
                 "Nieuwpoort - Buoy",
                 "39.0",
                 "cm",
                 "10% highest waves"
+            )
         ));
     }
 }

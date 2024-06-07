@@ -1,0 +1,19 @@
+@namespace("org.streaming.example.adapter.events")
+protocol feedback {
+
+	/** Triggered when someone is entering feedback */
+	record FeedbackGiven {
+
+		/** The id through which feedback can be identified */
+		string feedbackId;
+		/** The location of where the feedback is given for */
+		string location;
+		/** The username of the person giving feedback. Can be random generated */
+		string username;
+		/** The effective feedback */
+		string comment;
+		/** The moment that the feedback is given */
+		string timestamp;
+	}
+
+}

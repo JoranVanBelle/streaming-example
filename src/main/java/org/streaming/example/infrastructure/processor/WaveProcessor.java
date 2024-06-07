@@ -8,20 +8,21 @@ import org.apache.kafka.streams.processor.api.Record;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.streaming.example.KiteableWaveDetected;
-import org.streaming.example.RawDataMeasured;
-import org.streaming.example.UnkiteableWaveDetected;
+import org.streaming.example.adapter.events.KiteableWaveDetected;
+import org.streaming.example.adapter.events.RawDataMeasured;
+import org.streaming.example.adapter.events.UnkiteableWaveDetected;
+import org.streaming.example.adapter.events.WaveDetected;
 
 import java.time.Clock;
 import java.time.Instant;
 
-public class WaveProcessor implements Processor<String, RawDataMeasured, String, SpecificRecord> {
+public class WaveProcessor implements Processor<String, RawDataMeasured, String, WaveDetected> {
 
     private final Logger logger = LoggerFactory.getLogger(WaveProcessor.class.getSimpleName());
     public static final String WAVE_PROCESSOR_STATE_STORE_NAME = "WaveProcessorStateStore";
     public static final String NAME = WaveProcessor.class.getSimpleName();
     private static final String WAVE_SENSOR_ID = "GH1";
-    private ProcessorContext<String, SpecificRecord> context;
+    private ProcessorContext<String, WaveDetected> context;
     private KeyValueStore<String, RawDataMeasured> keyValueStore;
     private final Clock clock;
 
@@ -33,7 +34,7 @@ public class WaveProcessor implements Processor<String, RawDataMeasured, String,
     }
 
     @Override
-    public void init(ProcessorContext<String, SpecificRecord> context) {
+    public void init(ProcessorContext<String, WaveDetected> context) {
         this.context = context;
         keyValueStore = context.getStateStore(WAVE_PROCESSOR_STATE_STORE_NAME);
     }
@@ -60,15 +61,15 @@ public class WaveProcessor implements Processor<String, RawDataMeasured, String,
                         return;
                     } else {
                         keyValueStore.put(event.key(), event.value());
-                        var notKiteableWind = mapToNotKiteableWaveDetected(event.value());
-                        context.forward(new Record<>(notKiteableWind.getSensorId(), notKiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                        var unkiteableWaveDetected = mapToNotKiteableWaveDetected(event.value());
+                        context.forward(new Record<>(unkiteableWaveDetected.getSensorId(), new WaveDetected(unkiteableWaveDetected), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                     }
                 } else {
                     // not kiteable - old
                     if (newWaveHeight > tresholdWaveheight) {
                         keyValueStore.put(event.key(), event.value());
-                        var notKiteableWind = mapToKiteableWaveDetected(event.value());
-                        context.forward(new Record<>(notKiteableWind.getSensorId(), notKiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                        var kiteableWaveDetected = mapToKiteableWaveDetected(event.value());
+                        context.forward(new Record<>(kiteableWaveDetected.getSensorId(), new WaveDetected(kiteableWaveDetected), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                     } else {
                         return;
                     }
@@ -77,10 +78,10 @@ public class WaveProcessor implements Processor<String, RawDataMeasured, String,
                 keyValueStore.put(event.key(), event.value());
                 if (newWaveHeight > tresholdWaveheight) {
                     var kiteableWaveDetected = mapToKiteableWaveDetected(event.value());
-                    context.forward(new Record<>(kiteableWaveDetected.getSensorId(), kiteableWaveDetected, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                    context.forward(new Record<>(kiteableWaveDetected.getSensorId(), new WaveDetected(kiteableWaveDetected), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                 } else {
                     var unkiteableWaveDetected = mapToNotKiteableWaveDetected(event.value());
-                    context.forward(new Record<>(unkiteableWaveDetected.getSensorId(), unkiteableWaveDetected, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                    context.forward(new Record<>(unkiteableWaveDetected.getSensorId(), new WaveDetected(unkiteableWaveDetected), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                 }
             }
         }

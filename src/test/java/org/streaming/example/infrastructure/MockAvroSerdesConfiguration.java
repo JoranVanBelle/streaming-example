@@ -6,12 +6,17 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.subject.TopicRecordNameStrategy;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerializer;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.Serializer;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.streaming.example.RawDataMeasured;
+import org.streaming.example.adapter.events.RawDataMeasured;
+import org.streaming.example.adapter.events.WaveDetected;
+import org.streaming.example.adapter.events.WindDirectionDetected;
+import org.streaming.example.adapter.events.WindSpeedDetected;
 import org.streaming.example.domain.AvroSerdesFactory;
 
 import java.util.HashMap;
@@ -41,6 +46,45 @@ public class MockAvroSerdesConfiguration implements AvroSerdesFactory {
     }
 
     @Override
+    public SpecificAvroSerde<WindSpeedDetected> windSpeedDetectedSerde() {
+
+        final SpecificAvroSerde<WindSpeedDetected> rawDataMeasuredSerde = new SpecificAvroSerde<>();
+        Map<String, Object> serdeConfig = new HashMap<>();
+        serdeConfig.put("schema.registry.url", schema_registry);
+        serdeConfig.put("auto.register.schemas", true);
+        serdeConfig.put("value.subject.name.strategy", TopicRecordNameStrategy.class);
+        serdeConfig.put("specific.avro.reader", true);
+        rawDataMeasuredSerde.configure(serdeConfig, false);
+        return rawDataMeasuredSerde;
+    }
+
+    @Override
+    public SpecificAvroSerde<WaveDetected> waveDetectedSerde() {
+
+        final SpecificAvroSerde<WaveDetected> rawDataMeasuredSerde = new SpecificAvroSerde<>();
+        Map<String, Object> serdeConfig = new HashMap<>();
+        serdeConfig.put("schema.registry.url", schema_registry);
+        serdeConfig.put("auto.register.schemas", true);
+        serdeConfig.put("value.subject.name.strategy", TopicRecordNameStrategy.class);
+        serdeConfig.put("specific.avro.reader", true);
+        rawDataMeasuredSerde.configure(serdeConfig, false);
+        return rawDataMeasuredSerde;
+    }
+
+    @Override
+    public SpecificAvroSerde<WindDirectionDetected> windDirectionDetectedSerde() {
+
+        final SpecificAvroSerde<WindDirectionDetected> rawDataMeasuredSerde = new SpecificAvroSerde<>();
+        Map<String, Object> serdeConfig = new HashMap<>();
+        serdeConfig.put("schema.registry.url", schema_registry);
+        serdeConfig.put("auto.register.schemas", true);
+        serdeConfig.put("value.subject.name.strategy", TopicRecordNameStrategy.class);
+        serdeConfig.put("specific.avro.reader", true);
+        rawDataMeasuredSerde.configure(serdeConfig, false);
+        return rawDataMeasuredSerde;
+    }
+
+    @Override
     public SpecificAvroSerde<?> specificSerde() {
         final SpecificAvroSerde<?> specificSerde= new SpecificAvroSerde<>();
         Map<String, Object> serdeConfig = new HashMap<>();
@@ -50,6 +94,13 @@ public class MockAvroSerdesConfiguration implements AvroSerdesFactory {
         serdeConfig.put("specific.avro.reader", true);
         specificSerde.configure(serdeConfig, false);
         return specificSerde;
+    }
+
+    @Override
+    public <T extends SpecificRecord> Serializer<T> specificAvroValueSerializer() {
+        Serializer<T> serializer = (new SpecificAvroSerde<T>(this.client)).serializer();
+        serializer.configure(this.getSerializerProperties(), false);
+        return serializer;
     }
 
     @Override

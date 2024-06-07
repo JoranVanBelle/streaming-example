@@ -1,6 +1,7 @@
 package org.streaming.example.mothers;
 
-import org.streaming.example.UnkiteableWindDetected;
+
+import org.streaming.example.adapter.events.UnkiteableWindSpeedDetected;
 
 public class UnkiteableWindSpeedDetectedMother {
     private String sensorId;
@@ -75,8 +76,8 @@ public class UnkiteableWindSpeedDetectedMother {
             return this;
         }
 
-        public UnkiteableWindDetected buildEvent() {
-            return UnkiteableWindDetected.newBuilder()
+        public UnkiteableWindSpeedDetected buildEvent() {
+            return UnkiteableWindSpeedDetected.newBuilder()
                     .setSensorId(sensorId)
                     .setLocation(location)
                     .setValue(value)

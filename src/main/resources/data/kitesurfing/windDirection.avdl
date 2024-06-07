@@ -1,0 +1,41 @@
+@namespace("org.streaming.example.adapter.events")
+protocol windDirection {
+
+	record UnknownRecord {}
+
+	/** Created when the wind direction measured is considered kiteable" */
+	record KiteableWindDirectionDetected {
+		/** The id of the sensor extracted from the api result */
+		string sensorId;
+		/** The value of de sensor at the time the api sent its result */
+		string location;
+		/** The unit in which the value of the sensor is expressed */
+		string value;
+		/** A description about what the sensor returns */
+		string unit;
+		/** A description about what the sensor returns */
+		string description;
+	}
+
+	/** Created when the wind direction measured is considered kiteable" */
+	record UnkiteableWindDirectionDetected {
+		/** The id of the sensor extracted from the api result */
+		string sensorId;
+		/** The value of de sensor at the time the api sent its result */
+		string location;
+		/** The unit in which the value of the sensor is expressed */
+		string value;
+		/** A description about what the sensor returns */
+		string unit;
+		/** A description about what the sensor returns */
+		string description;
+	}
+
+	record WindDirectionDetected {
+		union {
+			UnknownRecord,
+			KiteableWindDirectionDetected,
+			UnkiteableWindDirectionDetected
+		} state;
+	}
+}

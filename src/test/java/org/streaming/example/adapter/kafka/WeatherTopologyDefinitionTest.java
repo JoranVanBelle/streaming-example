@@ -1,5 +1,6 @@
 package org.streaming.example.adapter.kafka;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -25,6 +27,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
@@ -87,8 +90,15 @@ class WeatherTopologyDefinitionTest {
                         .withBody(getJsonContentFromFile("/json/meetnetvlaamsebanken/catalog.json"))));
     }
 
+    @AfterEach
+    void tearDown() {
+        weatherRepository.deleteAll();
+    }
+
     @Test
     void givenOneKiteableAndOneNotKiteableWeather_whenQuerriesAll_ReturnsDataFromPlaces() {
+        mutableClock.fastForward(Duration.of(123, MILLIS));
+
         await().atMost(15, SECONDS)
                 .untilAsserted(() ->
                     mockMvc

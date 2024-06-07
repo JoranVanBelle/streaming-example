@@ -1,0 +1,41 @@
+@namespace("org.streaming.example.adapter.events")
+protocol wave {
+
+	record UnknownRecord {}
+
+	/** Created when the wave measured is considered kiteable */
+	record KiteableWaveDetected {
+		/** The id of the sensor extracted from the api result */
+		string sensorId;
+		/** The location of where the sensor is */
+		string location;
+		/** The value of de sensor at the time the api sent its result */
+		string value;
+		/** The unit in which the value of the sensor is expressed */
+		string unit;
+		/** A description about what the sensor returns */
+		string description;
+	}
+
+	/** Created when the wave measured is considered not kiteable */
+	record UnkiteableWaveDetected {
+		/** The id of the sensor extracted from the api result */
+		string sensorId;
+		/** The location of where the sensor is */
+		string location;
+		/** The value of de sensor at the time the api sent its result */
+		string value;
+		/** The unit in which the value of the sensor is expressed */
+		string unit;
+		/** A description about what the sensor returns */
+		string description;
+	}
+
+	record WaveDetected {
+		union {
+			UnknownRecord,
+			KiteableWaveDetected,
+			UnkiteableWaveDetected
+		} state;
+	}
+}

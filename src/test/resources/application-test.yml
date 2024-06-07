@@ -21,3 +21,4 @@ spring:
 
     properties:
       schema.registry.url: mock://schema-registry
+      auto.register.schemas: true

@@ -1,6 +1,7 @@
 package org.streaming.example.mothers;
 
-import org.streaming.example.KiteableWaveDetected;
+
+import org.streaming.example.adapter.events.KiteableWaveDetected;
 
 public class KiteableWaveDetectedMother {
     private String sensorId;

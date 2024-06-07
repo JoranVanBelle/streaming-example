@@ -4,15 +4,18 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroDeserializer;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerializer;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.Serializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.ssl.SslBundles;
-import org.springframework.context.annotation.Profile;
-import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.stereotype.Component;
-import org.streaming.example.RawDataMeasured;
+import org.streaming.example.adapter.events.RawDataMeasured;
+import org.streaming.example.adapter.events.WaveDetected;
+import org.streaming.example.adapter.events.WindDirectionDetected;
+import org.streaming.example.adapter.events.WindSpeedDetected;
 import org.streaming.example.domain.AvroSerdesFactory;
 
 import java.util.HashMap;
@@ -44,12 +47,46 @@ public class SerdesFactory implements AvroSerdesFactory {
     }
 
     @Override
+    public SpecificAvroSerde<WindSpeedDetected> windSpeedDetectedSerde() {
+        final SpecificAvroSerde<WindSpeedDetected> rawDataMeasuredSerde = new SpecificAvroSerde<>();
+        Map<String, String> serdeConfig = new HashMap<>();
+        serdeConfig.put("schema.registry.url", schema_registry);
+        rawDataMeasuredSerde.configure(serdeConfig, false);
+        return rawDataMeasuredSerde;
+    }
+
+    @Override
+    public SpecificAvroSerde<WaveDetected> waveDetectedSerde() {
+        final SpecificAvroSerde<WaveDetected> rawDataMeasuredSerde = new SpecificAvroSerde<>();
+        Map<String, String> serdeConfig = new HashMap<>();
+        serdeConfig.put("schema.registry.url", schema_registry);
+        rawDataMeasuredSerde.configure(serdeConfig, false);
+        return rawDataMeasuredSerde;
+    }
+
+    @Override
+    public SpecificAvroSerde<WindDirectionDetected> windDirectionDetectedSerde() {
+        final SpecificAvroSerde<WindDirectionDetected> rawDataMeasuredSerde = new SpecificAvroSerde<>();
+        Map<String, String> serdeConfig = new HashMap<>();
+        serdeConfig.put("schema.registry.url", schema_registry);
+        rawDataMeasuredSerde.configure(serdeConfig, false);
+        return rawDataMeasuredSerde;
+    }
+
+    @Override
     public SpecificAvroSerde<?> specificSerde() {
         final SpecificAvroSerde<?> rawDataMeasuredSerde = new SpecificAvroSerde<>();
         Map<String, String> serdeConfig = new HashMap<>();
         serdeConfig.put("schema.registry.url", schema_registry);
         rawDataMeasuredSerde.configure(serdeConfig, false);
         return rawDataMeasuredSerde;
+    }
+
+    @Override
+    public <T extends SpecificRecord> Serializer<T> specificAvroValueSerializer() {
+        SpecificAvroSerializer<T> serializer = new SpecificAvroSerializer<>();
+        serializer.configure(this.withSpecificReaderConfig(this.kafkaProperties.buildProducerProperties((SslBundles)null)), false);
+        return serializer;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package org.streaming.example.infrastructure;
 
-import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.annotation.Bean;
