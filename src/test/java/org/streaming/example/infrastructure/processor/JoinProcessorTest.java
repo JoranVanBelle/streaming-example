@@ -11,17 +11,19 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.kafka.annotation.EnableKafkaStreams;
-import org.streaming.example.KiteableWaveDetected;
-import org.streaming.example.KiteableWeatherDetected;
-import org.streaming.example.KiteableWindDetected;
-import org.streaming.example.KiteableWindDirectionDetected;
-import org.streaming.example.UnkiteableWaveDetected;
-import org.streaming.example.UnkiteableWindDetected;
-import org.streaming.example.UnkiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.KiteableWaveDetected;
+import org.streaming.example.adapter.events.KiteableWeatherDetected;
+import org.streaming.example.adapter.events.KiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.KiteableWindSpeedDetected;
+import org.streaming.example.adapter.events.UnkiteableWaveDetected;
+import org.streaming.example.adapter.events.UnkiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.UnkiteableWindSpeedDetected;
+import org.streaming.example.adapter.events.WaveDetected;
+import org.streaming.example.adapter.events.WeatherDetected;
+import org.streaming.example.adapter.events.WindDirectionDetected;
+import org.streaming.example.adapter.events.WindSpeedDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
@@ -33,18 +35,16 @@ import org.streaming.example.mothers.KiteableWindSpeedDetectedMother;
 import org.streaming.example.mothers.UnkiteableWaveDetectedMother;
 import org.streaming.example.mothers.UnkiteableWindDirectionDetectedMother;
 import org.streaming.example.mothers.UnkiteableWindSpeedDetectedMother;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.utility.DockerImageName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TopologyTest(
-        includeFilters = @ComponentScan.Filter(
-                type = FilterType.REGEX,
-                pattern = {
-                      ".*\\infrastructure\\.*"
-                }
-        )
+    includeFilters = @ComponentScan.Filter(
+        type = FilterType.REGEX,
+        pattern = {
+            ".*\\infrastructure\\.*"
+        }
+    )
 )
 public class JoinProcessorTest extends KafkaContainerSupport {
 
@@ -60,90 +60,72 @@ public class JoinProcessorTest extends KafkaContainerSupport {
     @Autowired
     private AvroSerdesFactory avroSerdesFactory;
 
-    TestInputTopic<String, Object> windRekeyTopic;
-    TestInputTopic<String, Object> waveRekeyTopic;
-    TestInputTopic<String, Object> windDirectionRekeyTopic;
+    TestInputTopic<String, WindSpeedDetected> windRekeyTopic;
+    TestInputTopic<String, WaveDetected> waveRekeyTopic;
+    TestInputTopic<String, WindDirectionDetected> windDirectionRekeyTopic;
     TestOutputTopic<String, SpecificRecord> weatherTopic;
 
     @BeforeEach
     void setUp() {
         windRekeyTopic = topologyTestDriver.createInputTopic(
-                kafkaTopicsProperties.getRekeyedWindDetected(),
-                new StringSerializer(),
-                avroSerdesFactory.avroSerializer());
+            kafkaTopicsProperties.getRekeyedWindDetected(),
+            new StringSerializer(),
+            avroSerdesFactory.specificAvroValueSerializer());
 
         waveRekeyTopic = topologyTestDriver.createInputTopic(
-                kafkaTopicsProperties.getRekeyedWaveDetected(),
-                new StringSerializer(),
-                avroSerdesFactory.avroSerializer());
+            kafkaTopicsProperties.getRekeyedWaveDetected(),
+            new StringSerializer(),
+            avroSerdesFactory.specificAvroValueSerializer());
 
         windDirectionRekeyTopic = topologyTestDriver.createInputTopic(
-                kafkaTopicsProperties.getRekeyedWindDirectionDetected(),
-                new StringSerializer(),
-                avroSerdesFactory.avroSerializer());
+            kafkaTopicsProperties.getRekeyedWindDirectionDetected(),
+            new StringSerializer(),
+            avroSerdesFactory.specificAvroValueSerializer());
 
         weatherTopic = topologyTestDriver.createOutputTopic(
-                kafkaTopicsProperties.getKiteWeatherDetected(),
-                new StringDeserializer(),
-                avroSerdesFactory.specificAvroValueDeserializer());
+            kafkaTopicsProperties.getKiteWeatherDetected(),
+            new StringDeserializer(),
+            avroSerdesFactory.specificAvroValueDeserializer());
     }
 
     @Nested
     class GivenASensorCombinationInputs {
 
-        KiteableWaveDetected kiteableWaveDetected;
-        KiteableWindDetected kiteableWindDetected;
-        KiteableWindDirectionDetected kiteableWindDirectionDetected;
-        UnkiteableWaveDetected unkiteableWaveDetected;
-        UnkiteableWindDetected unkiteableWindDetected;
-        UnkiteableWindDirectionDetected unkiteableWindDirectionDetected;
-
-        @BeforeEach
-        void givenASensorCombinationInputs() {
-            kiteableWaveDetected = KiteableWaveDetectedMother.newEvent()
-                    .withSensorId("Nieuwpoort")
-                    .buildEvent();
-
-            kiteableWindDetected = KiteableWindSpeedDetectedMother.newEvent()
-                    .withSensorId("Nieuwpoort")
-                    .buildEvent();
-
-            kiteableWindDirectionDetected = KiteableWindDirectionDetectedMother.newEvent()
-                    .withSensorId("Nieuwpoort")
-                    .buildEvent();
-
-            unkiteableWaveDetected = UnkiteableWaveDetectedMother.newEvent()
-                    .withSensorId("Nieuwpoort")
-                    .buildEvent();
-
-            unkiteableWindDetected = UnkiteableWindSpeedDetectedMother.newEvent()
-                    .withSensorId("Nieuwpoort")
-                    .buildEvent();
-
-            unkiteableWindDirectionDetected = UnkiteableWindDirectionDetectedMother.newEvent()
-                    .withSensorId("Nieuwpoort")
-                    .buildEvent();
-        }
-
         @Test
         void thenTheEventsCanBeJoined() {
-            // given - when
-            waveRekeyTopic.pipeInput(kiteableWaveDetected.getSensorId(), kiteableWaveDetected);
-            windRekeyTopic.pipeInput(kiteableWindDetected.getSensorId(), kiteableWindDetected);
-            windDirectionRekeyTopic.pipeInput(kiteableWindDirectionDetected.getSensorId(), kiteableWindDirectionDetected);
+            // given
+            var kiteableWaveDetected = KiteableWaveDetectedMother.newEvent()
+                .withSensorId("Nieuwpoort")
+                .buildEvent();
+
+            var kiteableWindSpeedDetected = KiteableWindSpeedDetectedMother.newEvent()
+                .withSensorId("Nieuwpoort")
+                .buildEvent();
+
+            var kiteableWindDirectionDetected = KiteableWindDirectionDetectedMother.newEvent()
+                .withSensorId("Nieuwpoort")
+                .buildEvent();
+
+            // when
+            waveRekeyTopic.pipeInput(kiteableWaveDetected.getSensorId(), new WaveDetected(kiteableWaveDetected));
+            windRekeyTopic.pipeInput(kiteableWindSpeedDetected.getSensorId(), new WindSpeedDetected(kiteableWindSpeedDetected));
+            windDirectionRekeyTopic.pipeInput(kiteableWindDirectionDetected.getSensorId(), new WindDirectionDetected(kiteableWindDirectionDetected));
 
             // then
             var result = weatherTopic.readValuesToList();
-            assertThat(result).contains(new KiteableWeatherDetected(
-                    "Nieuwpoort - Buoy",
-                    "Nieuwpoort - Buoy",
-                    "1000",
-                    "m/s",
-                    "39.0",
-                    "cm",
-                    "270",
-                    "deg"
-            ));
+            assertThat(result).contains(
+                new WeatherDetected(
+                    new KiteableWeatherDetected(
+                        "Nieuwpoort - Buoy",
+                        "Nieuwpoort - Buoy",
+                        "1000",
+                        "m/s",
+                        "39.0",
+                        "cm",
+                        "270",
+                        "deg"
+                    )
+                ));
         }
     }
 
@@ -151,55 +133,61 @@ public class JoinProcessorTest extends KafkaContainerSupport {
     void givenKiteableWeather_whenWavesBecomeUnkiteable_weatherShouldBeUpdated() {
         // given
         var kiteableWaveDetected = KiteableWaveDetectedMother.newEvent()
-                .withSensorId("LocationX")
-                .withLocation("LocationX")
-                .buildEvent();
+            .withSensorId("LocationX")
+            .withLocation("LocationX")
+            .buildEvent();
 
-        var kiteableWindDetected = KiteableWindSpeedDetectedMother.newEvent()
-                .withSensorId("LocationX")
-                .withLocation("LocationX")
-                .buildEvent();
+        var kiteableWindSpeedDetected = KiteableWindSpeedDetectedMother.newEvent()
+            .withSensorId("LocationX")
+            .withLocation("LocationX")
+            .buildEvent();
 
         var kiteableWindDirectionDetected = KiteableWindDirectionDetectedMother.newEvent()
-                .withSensorId("LocationX")
-                .withLocation("LocationX")
-                .buildEvent();
+            .withSensorId("LocationX")
+            .withLocation("LocationX")
+            .buildEvent();
 
         var unkiteableWaveDetected = UnkiteableWaveDetectedMother.newEvent()
-                .withSensorId("LocationX")
-                .withLocation("LocationX")
-                .buildEvent();
+            .withSensorId("LocationX")
+            .withLocation("LocationX")
+            .buildEvent();
 
         // when
-        waveRekeyTopic.pipeInput(kiteableWaveDetected.getSensorId(), kiteableWaveDetected);
-        windRekeyTopic.pipeInput(kiteableWindDetected.getSensorId(), kiteableWindDetected);
-        windDirectionRekeyTopic.pipeInput(kiteableWindDirectionDetected.getSensorId(), kiteableWindDirectionDetected);
+        waveRekeyTopic.pipeInput(kiteableWaveDetected.getSensorId(), new WaveDetected(kiteableWaveDetected));
+        windRekeyTopic.pipeInput(kiteableWindSpeedDetected.getSensorId(), new WindSpeedDetected(kiteableWindSpeedDetected));
+        windDirectionRekeyTopic.pipeInput(kiteableWindDirectionDetected.getSensorId(), new WindDirectionDetected(kiteableWindDirectionDetected));
 
         // then
         var result = weatherTopic.readValuesToList();
 
-        assertThat(result).contains(new KiteableWeatherDetected(
-                "LocationX",
-                "LocationX",
-                "1000",
-                "m/s",
-                "39.0",
-                "cm",
-                "270",
-                "deg"
-        ));
+        assertThat(result).contains(
+            new WeatherDetected(
+                new KiteableWeatherDetected(
+                    "LocationX",
+                    "LocationX",
+                    "1000",
+                    "m/s",
+                    "39.0",
+                    "cm",
+                    "270",
+                    "deg"
+                )
+            ));
 
-        waveRekeyTopic.pipeInput(unkiteableWaveDetected.getSensorId(), unkiteableWaveDetected);
+        waveRekeyTopic.pipeInput(unkiteableWaveDetected.getSensorId(), new WaveDetected(unkiteableWaveDetected));
 
-        assertThat(result).contains(new KiteableWeatherDetected(
-                "LocationX",
-                "LocationX",
-                "1000",
-                "m/s",
-                "39.0",
-                "cm",
-                "270",
-                "deg"
-        ));
+        assertThat(result).contains(
+            new WeatherDetected(
+                new KiteableWeatherDetected(
+                    "LocationX",
+                    "LocationX",
+                    "1000",
+                    "m/s",
+                    "39.0",
+                    "cm",
+                    "270",
+                    "deg"
+                )
+            ));
     }
 }

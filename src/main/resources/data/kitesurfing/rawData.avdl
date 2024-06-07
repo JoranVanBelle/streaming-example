@@ -1,0 +1,18 @@
+@namespace("org.streaming.example.adapter.events")
+protocol rawData {
+
+	/** Created when an interesting sensor is measured" */
+	record RawDataMeasured {
+		/** The id of the sensor extracted from the api result */
+		string sensorId;
+		/** The value of de sensor at the time the api sent its result */
+		string location;
+		/** The unit in which the value of the sensor is expressed */
+		string value;
+		/** A description about what the sensor returns */
+		string unit;
+		/** A description about what the sensor returns */
+		string description;
+	}
+
+}

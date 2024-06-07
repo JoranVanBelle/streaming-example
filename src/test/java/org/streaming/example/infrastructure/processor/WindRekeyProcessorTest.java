@@ -10,7 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.streaming.example.KiteableWindDetected;
+import org.streaming.example.adapter.events.KiteableWindSpeedDetected;
+import org.streaming.example.adapter.events.WindSpeedDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
@@ -42,15 +43,15 @@ public class WindRekeyProcessorTest extends KafkaContainerSupport {
     @BeforeEach
     void setUp() {
         windTopic = topologyTestDriver.createInputTopic(
-                kafkaTopicsProperties.getWindDetected(),
-                new StringSerializer(),
-                avroSerdesFactory.avroSerializer());
+            kafkaTopicsProperties.getWindDetected(),
+            new StringSerializer(),
+            avroSerdesFactory.avroSerializer());
 
 
         windRekeyTopic = topologyTestDriver.createOutputTopic(
-                kafkaTopicsProperties.getRekeyedWindDetected(),
-                new StringDeserializer(),
-                avroSerdesFactory.specificAvroValueDeserializer());
+            kafkaTopicsProperties.getRekeyedWindDetected(),
+            new StringDeserializer(),
+            avroSerdesFactory.specificAvroValueDeserializer());
     }
 
     @Test
@@ -58,11 +59,11 @@ public class WindRekeyProcessorTest extends KafkaContainerSupport {
         //given
         var key = UUID.randomUUID().toString();
         var kiteableWind = KiteableWindSpeedDetectedMother.newEvent()
-                .withSensorId("NP-%s-WVC".formatted(key))
-                .buildEvent();
+            .withSensorId("NP-%s-WVC".formatted(key))
+            .buildEvent();
 
         // when
-        windTopic.pipeInput(kiteableWind.getSensorId(), kiteableWind);
+        windTopic.pipeInput(kiteableWind.getSensorId(), new WindSpeedDetected(kiteableWind));
 
         // then
         var result = windRekeyTopic.readKeyValuesToList();
@@ -75,21 +76,24 @@ public class WindRekeyProcessorTest extends KafkaContainerSupport {
         //given
         var key = UUID.randomUUID().toString();
         var kiteableWind = KiteableWindSpeedDetectedMother.newEvent()
-                .withSensorId("NP-%s-WVC".formatted(key))
-                .buildEvent();
+            .withSensorId("NP-%s-WVC".formatted(key))
+            .buildEvent();
 
         // when
-        windTopic.pipeInput(kiteableWind.getSensorId(), kiteableWind);
+        windTopic.pipeInput(kiteableWind.getSensorId(), new WindSpeedDetected(kiteableWind));
 
         // then
         var result = windRekeyTopic.readKeyValuesToList();
 
-        assertThat(result.getLast().value).isEqualTo(new KiteableWindDetected(
-                "NP-%s-WVC".formatted(key),
-                "Nieuwpoort - Wind measurement",
-                "1000",
-                "m/s",
-                "Average wind speed (at 10 m height)"
-        ));
+        assertThat(result.getLast().value).isEqualTo(
+            new WindSpeedDetected(
+                new KiteableWindSpeedDetected(
+                    "NP-%s-WVC".formatted(key),
+                    "Nieuwpoort - Wind measurement",
+                    "1000",
+                    "m/s",
+                    "Average wind speed (at 10 m height)"
+                )
+            ));
     }
 }

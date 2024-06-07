@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.streaming.example.FeedbackGiven;
-import org.streaming.example.RawDataMeasured;
+import org.streaming.example.adapter.events.FeedbackGiven;
+import org.streaming.example.adapter.events.RawDataMeasured;
 
 @Configuration
 public class KafkaTemplateConfiguration {

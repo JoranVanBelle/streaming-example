@@ -1,11 +1,10 @@
 package org.streaming.example.application.feedback;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import org.streaming.example.FeedbackGiven;
 import org.streaming.example.adapter.FeedbackUsernameProperties;
+import org.streaming.example.adapter.events.FeedbackGiven;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.domain.http.UseCaseResult;
 import org.streaming.example.domain.http.feedback.FeedbackRequest;

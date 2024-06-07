@@ -2,7 +2,8 @@ package org.streaming.example.adapter.kafka;
 
 import org.apache.avro.specific.SpecificRecord;
 import org.springframework.stereotype.Component;
-import org.streaming.example.FeedbackGiven;
+import org.streaming.example.adapter.events.FeedbackGiven;
+import org.streaming.example.adapter.events.WeatherDetected;
 import org.streaming.example.domain.AvroSerdesFactory;
 import org.streaming.example.domain.FeedbackRepository;
 import org.streaming.example.domain.WeatherRepository;
@@ -47,7 +48,7 @@ public class DatabaseWriterTopologyDefinition implements TopologyDefinition {
 
     @Override
     public List<ProcessorDefinition<?, ?, ?, ?>> processors() {
-        return List.of(ProcessorDefinition.<String, SpecificRecord, Void, Void>newProcessorDefinition()
+        return List.of(ProcessorDefinition.<String, WeatherDetected, Void, Void>newProcessorDefinition()
                         .withName(WeatherDatabaseWriterProcessor.NAME)
                         .withParents(kafkaTopicsProperties.getKiteWeatherDetected())
                         .withProcessorSupplier(() -> new WeatherDatabaseWriterProcessor(weatherRepository))

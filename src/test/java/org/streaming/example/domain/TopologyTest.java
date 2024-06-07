@@ -1,25 +1,8 @@
 package org.streaming.example.domain;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTestContextBootstrapper;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.kafka.annotation.EnableKafkaStreams;
-import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
-import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.BootstrapWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
-import org.streaming.example.infrastructure.MockAvroSerdesConfiguration;
-import org.streaming.example.infrastructure.TopologyConfiguration;
-import org.streaming.example.infrastructure.TopologyTestDriverConfiguration;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.lang.annotation.Documented;

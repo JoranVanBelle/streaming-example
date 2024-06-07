@@ -3,7 +3,6 @@ package org.streaming.example.domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.springframework.cglib.core.Local;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;

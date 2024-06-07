@@ -4,13 +4,13 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.streaming.example.RawDataMeasured;
 import org.streaming.example.adapter.MeetnetVlaamseBankenCatalog;
 import org.streaming.example.adapter.MeetnetVlaamseBankenCatalog.AvailableData;
 import org.streaming.example.adapter.MeetnetVlaamseBankenCatalog.Location;
 import org.streaming.example.adapter.MeetnetVlaamseBankenCatalog.Name;
 import org.streaming.example.adapter.MeetnetVlaamseBankenCatalog.Parameter;
 import org.streaming.example.adapter.MeetnetVlaamseBankenData;
+import org.streaming.example.adapter.events.RawDataMeasured;
 import org.streaming.example.adapter.http.meetnetvlaamsebanken.MeetnetVlaamseBankenController;
 import org.streaming.example.domain.meetnetvlaamsebanken.MeetnetVlaamseBankenProperties;
 

@@ -13,9 +13,6 @@ import org.streaming.example.domain.http.feedback.FeedbackRequest;
 
 import java.net.URI;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 @RestController
 public class FeedbackController {
 

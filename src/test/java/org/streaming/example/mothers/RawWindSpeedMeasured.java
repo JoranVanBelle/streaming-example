@@ -1,6 +1,7 @@
 package org.streaming.example.mothers;
 
-import org.streaming.example.RawDataMeasured;
+
+import org.streaming.example.adapter.events.RawDataMeasured;
 
 public class RawWindSpeedMeasured {
 

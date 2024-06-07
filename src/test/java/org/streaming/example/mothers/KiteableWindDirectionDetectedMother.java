@@ -1,6 +1,7 @@
 package org.streaming.example.mothers;
 
-import org.streaming.example.KiteableWindDirectionDetected;
+
+import org.streaming.example.adapter.events.KiteableWindDirectionDetected;
 
 public class KiteableWindDirectionDetectedMother {
     private String sensorId;

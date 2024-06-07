@@ -7,14 +7,14 @@ import org.apache.kafka.streams.TestInputTopic;
 import org.apache.kafka.streams.TestOutputTopic;
 import org.apache.kafka.streams.TopologyTestDriver;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.streaming.example.KiteableWaveDetected;
-import org.streaming.example.UnkiteableWaveDetected;
+import org.streaming.example.adapter.events.KiteableWaveDetected;
+import org.streaming.example.adapter.events.UnkiteableWaveDetected;
+import org.streaming.example.adapter.events.WaveDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
@@ -54,14 +54,14 @@ class WaveProcessorTest extends KafkaContainerSupport {
     @BeforeEach
     void setUp() {
         rawDataMeasuredTopic = topologyTestDriver.createInputTopic(
-                kafkaTopicsProperties.getRawDataMeasured(),
-                new StringSerializer(),
-                avroSerdesFactory.avroSerializer());
+            kafkaTopicsProperties.getRawDataMeasured(),
+            new StringSerializer(),
+            avroSerdesFactory.avroSerializer());
 
         waveTopic = topologyTestDriver.createOutputTopic(
-                kafkaTopicsProperties.getWaveDetected(),
-                new StringDeserializer(),
-                avroSerdesFactory.specificAvroValueDeserializer());
+            kafkaTopicsProperties.getWaveDetected(),
+            new StringDeserializer(),
+            avroSerdesFactory.specificAvroValueDeserializer());
     }
 
     @Test
@@ -69,14 +69,14 @@ class WaveProcessorTest extends KafkaContainerSupport {
         //given
         var key = UUID.randomUUID().toString();
         var notKiteableWaves = RawWaveHeightMeasured.newEvent()
-                .withNotKiteableWave()
-                .withSensorId("NP-%s-GH1".formatted(key))
-                .build();
+            .withNotKiteableWave()
+            .withSensorId("NP-%s-GH1".formatted(key))
+            .build();
         var notKiteableWaves2 = RawWaveHeightMeasured.newEvent()
-                .withNotKiteableWave()
-                .withSensorId("NP-%s-GH1".formatted(key))
-                .withValue("-1")
-                .build();
+            .withNotKiteableWave()
+            .withSensorId("NP-%s-GH1".formatted(key))
+            .withValue("-1")
+            .build();
 
         // when
         rawDataMeasuredTopic.pipeInput(notKiteableWaves.getSensorId(), notKiteableWaves);
@@ -85,21 +85,26 @@ class WaveProcessorTest extends KafkaContainerSupport {
         // then
         var result = waveTopic.readValuesToList();
 
-        assertThat(result).contains(new UnkiteableWaveDetected(
+        assertThat(result).contains(new WaveDetected(
+            new UnkiteableWaveDetected(
                 notKiteableWaves.getSensorId(),
                 notKiteableWaves.getLocation(),
                 notKiteableWaves.getValue(),
                 notKiteableWaves.getUnit(),
                 notKiteableWaves.getDescription()
-        ));
+            ))
+        );
 
-        assertThat(result).doesNotContain(new UnkiteableWaveDetected(
-                notKiteableWaves2.getSensorId(),
-                notKiteableWaves2.getLocation(),
-                notKiteableWaves2.getValue(),
-                notKiteableWaves2.getUnit(),
-                notKiteableWaves2.getDescription()
-        ));
+        assertThat(result).doesNotContain(
+            new WaveDetected(
+                new UnkiteableWaveDetected(
+                    notKiteableWaves2.getSensorId(),
+                    notKiteableWaves2.getLocation(),
+                    notKiteableWaves2.getValue(),
+                    notKiteableWaves2.getUnit(),
+                    notKiteableWaves2.getDescription()
+                ))
+        );
     }
 
     @Test
@@ -107,14 +112,14 @@ class WaveProcessorTest extends KafkaContainerSupport {
         //given
         var key = UUID.randomUUID().toString();
         var kiteableWaves = RawWaveHeightMeasured.newEvent()
-                .withKiteableWave()
-                .withSensorId("NP-%s-GH1".formatted(key))
-                .build();
+            .withKiteableWave()
+            .withSensorId("NP-%s-GH1".formatted(key))
+            .build();
         var kiteableWaves2 = RawWaveHeightMeasured.newEvent()
-                .withValue("1001")
-                .withSensorId("NP-%s-GH1".formatted(key))
-                .withValue("-1")
-                .build();
+            .withValue("1001")
+            .withSensorId("NP-%s-GH1".formatted(key))
+            .withValue("-1")
+            .build();
 
         // when
         rawDataMeasuredTopic.pipeInput(kiteableWaves.getSensorId(), kiteableWaves);
@@ -123,21 +128,27 @@ class WaveProcessorTest extends KafkaContainerSupport {
         // then
         var result = waveTopic.readValuesToList();
 
-        assertThat(result).contains(new KiteableWaveDetected(
-                kiteableWaves.getSensorId(),
-                kiteableWaves.getLocation(),
-                kiteableWaves.getValue(),
-                kiteableWaves.getUnit(),
-                kiteableWaves.getDescription()
-        ));
+        assertThat(result).contains(
+            new WaveDetected(
+                new KiteableWaveDetected(
+                    kiteableWaves.getSensorId(),
+                    kiteableWaves.getLocation(),
+                    kiteableWaves.getValue(),
+                    kiteableWaves.getUnit(),
+                    kiteableWaves.getDescription()
+                )
+            ));
 
-        assertThat(result).doesNotContain(new KiteableWaveDetected(
-                kiteableWaves2.getSensorId(),
-                kiteableWaves2.getLocation(),
-                kiteableWaves2.getValue(),
-                kiteableWaves2.getUnit(),
-                kiteableWaves2.getDescription()
-        ));
+        assertThat(result).doesNotContain(
+            new WaveDetected(
+                new KiteableWaveDetected(
+                    kiteableWaves2.getSensorId(),
+                    kiteableWaves2.getLocation(),
+                    kiteableWaves2.getValue(),
+                    kiteableWaves2.getUnit(),
+                    kiteableWaves2.getDescription()
+                )
+            ));
     }
 
     @Test
@@ -145,13 +156,13 @@ class WaveProcessorTest extends KafkaContainerSupport {
         //given
         var key = UUID.randomUUID().toString();
         var notKiteableWaves = RawWaveHeightMeasured.newEvent()
-                .withNotKiteableWave()
-                .withSensorId("NP-%s-GH1".formatted(key))
-                .build();
+            .withNotKiteableWave()
+            .withSensorId("NP-%s-GH1".formatted(key))
+            .build();
         var kiteableWaves = RawWaveHeightMeasured.newEvent()
-                .withKiteableWave()
-                .withSensorId("NP-%s-GH1".formatted(key))
-                .build();
+            .withKiteableWave()
+            .withSensorId("NP-%s-GH1".formatted(key))
+            .build();
 
         // when
         rawDataMeasuredTopic.pipeInput(notKiteableWaves.getSensorId(), notKiteableWaves);
@@ -160,21 +171,27 @@ class WaveProcessorTest extends KafkaContainerSupport {
         // then
         var result = waveTopic.readValuesToList();
 
-        assertThat(result).contains(new UnkiteableWaveDetected(
-                notKiteableWaves.getSensorId(),
-                notKiteableWaves.getLocation(),
-                notKiteableWaves.getValue(),
-                notKiteableWaves.getUnit(),
-                notKiteableWaves.getDescription()
-        ));
+        assertThat(result).contains(
+            new WaveDetected(
+                new UnkiteableWaveDetected(
+                    notKiteableWaves.getSensorId(),
+                    notKiteableWaves.getLocation(),
+                    notKiteableWaves.getValue(),
+                    notKiteableWaves.getUnit(),
+                    notKiteableWaves.getDescription()
+                )
+            ));
 
-        assertThat(result).contains(new KiteableWaveDetected(
-                kiteableWaves.getSensorId(),
-                kiteableWaves.getLocation(),
-                kiteableWaves.getValue(),
-                kiteableWaves.getUnit(),
-                kiteableWaves.getDescription()
-        ));
+        assertThat(result).contains(
+            new WaveDetected(
+                new KiteableWaveDetected(
+                    kiteableWaves.getSensorId(),
+                    kiteableWaves.getLocation(),
+                    kiteableWaves.getValue(),
+                    kiteableWaves.getUnit(),
+                    kiteableWaves.getDescription()
+                )
+            ));
     }
 
     @Test
@@ -182,13 +199,13 @@ class WaveProcessorTest extends KafkaContainerSupport {
         //given
         var key = UUID.randomUUID().toString();
         var kiteableWaves = RawWaveHeightMeasured.newEvent()
-                .withKiteableWave()
-                .withSensorId("NP-%s-GH1".formatted(key))
-                .build();
+            .withKiteableWave()
+            .withSensorId("NP-%s-GH1".formatted(key))
+            .build();
         var notKiteableWaves = RawWaveHeightMeasured.newEvent()
-                .withNotKiteableWave()
-                .withSensorId("NP-%s-GH1".formatted(key))
-                .build();
+            .withNotKiteableWave()
+            .withSensorId("NP-%s-GH1".formatted(key))
+            .build();
 
         // when
         rawDataMeasuredTopic.pipeInput(kiteableWaves.getSensorId(), kiteableWaves);
@@ -197,20 +214,26 @@ class WaveProcessorTest extends KafkaContainerSupport {
         // then
         var result = waveTopic.readValuesToList();
 
-        assertThat(result).contains(new KiteableWaveDetected(
-                kiteableWaves.getSensorId(),
-                kiteableWaves.getLocation(),
-                kiteableWaves.getValue(),
-                kiteableWaves.getUnit(),
-                kiteableWaves.getDescription()
-        ));
+        assertThat(result).contains(
+            new WaveDetected(
+                new KiteableWaveDetected(
+                    kiteableWaves.getSensorId(),
+                    kiteableWaves.getLocation(),
+                    kiteableWaves.getValue(),
+                    kiteableWaves.getUnit(),
+                    kiteableWaves.getDescription()
+                )
+            ));
 
-        assertThat(result).contains(new UnkiteableWaveDetected(
-                notKiteableWaves.getSensorId(),
-                notKiteableWaves.getLocation(),
-                notKiteableWaves.getValue(),
-                notKiteableWaves.getUnit(),
-                notKiteableWaves.getDescription()
-        ));
+        assertThat(result).contains(
+            new WaveDetected(
+                new UnkiteableWaveDetected(
+                    notKiteableWaves.getSensorId(),
+                    notKiteableWaves.getLocation(),
+                    notKiteableWaves.getValue(),
+                    notKiteableWaves.getUnit(),
+                    notKiteableWaves.getDescription()
+                )
+            ));
     }
 }

@@ -8,32 +8,33 @@ import org.apache.kafka.streams.processor.api.Record;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.streaming.example.KiteableWindDetected;
-import org.streaming.example.RawDataMeasured;
-import org.streaming.example.UnkiteableWindDetected;
+import org.streaming.example.adapter.events.KiteableWindSpeedDetected;
+import org.streaming.example.adapter.events.RawDataMeasured;
+import org.streaming.example.adapter.events.UnkiteableWindSpeedDetected;
+import org.streaming.example.adapter.events.WindSpeedDetected;
 
 import java.time.Clock;
 import java.time.Instant;
 
-public class WindProcessor implements Processor<String, RawDataMeasured, String, SpecificRecord> {
+public class WindSpeedProcessor implements Processor<String, RawDataMeasured, String, WindSpeedDetected> {
 
-    private final Logger logger = LoggerFactory.getLogger(WindProcessor.class.getSimpleName());
+    private final Logger logger = LoggerFactory.getLogger(WindSpeedProcessor.class.getSimpleName());
     public static final String WIND_PROCESSOR_STATE_STORE_NAME = "WindProcessorStateStore";
-    public static final String NAME = WindProcessor.class.getSimpleName();
+    public static final String NAME = WindSpeedProcessor.class.getSimpleName();
     private static final String WIND_SPEED_SENSOR_ID = "WVC";
-    private ProcessorContext<String, SpecificRecord> context;
+    private ProcessorContext<String, WindSpeedDetected> context;
     private KeyValueStore<String, RawDataMeasured> keyValueStore;
     private final Clock clock;
 
     private final double tresholdWindSpeed;
 
-    public WindProcessor(Clock clock, double tresholdWindSpeed) {
+    public WindSpeedProcessor(Clock clock, double tresholdWindSpeed) {
         this.clock = clock;
         this.tresholdWindSpeed = tresholdWindSpeed;
     }
 
     @Override
-    public void init(ProcessorContext<String, SpecificRecord> context) {
+    public void init(ProcessorContext<String, WindSpeedDetected> context) {
         this.context = context;
         keyValueStore = context.getStateStore(WIND_PROCESSOR_STATE_STORE_NAME);
     }
@@ -59,14 +60,14 @@ public class WindProcessor implements Processor<String, RawDataMeasured, String,
                         return;
                     } else {
                         keyValueStore.put(event.key(), event.value());
-                        var notKiteableWind = mapToNotKiteableWindDetected(event.value());
-                        context.forward(new Record<>(notKiteableWind.getSensorId(), notKiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                        var notKiteableWindSpeed = mapToNotKiteableWindDetected(event.value());
+                        context.forward(new Record<>(notKiteableWindSpeed.getSensorId(), new WindSpeedDetected(notKiteableWindSpeed), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                     }
                 } else {
                     if (newWindSpeed > tresholdWindSpeed) {
                         keyValueStore.put(event.key(), event.value());
-                        var kiteableWind = mapToKiteableWindDetected(event.value());
-                        context.forward(new Record<>(kiteableWind.getSensorId(), kiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                        var kiteableWindSpeed = mapToKiteableWindDetected(event.value());
+                        context.forward(new Record<>(kiteableWindSpeed.getSensorId(), new WindSpeedDetected(kiteableWindSpeed), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                     } else {
                         return;
                     }
@@ -74,11 +75,11 @@ public class WindProcessor implements Processor<String, RawDataMeasured, String,
             } else {
                 keyValueStore.put(event.key(), event.value());
                 if (newWindSpeed > tresholdWindSpeed) {
-                    var kiteableWind = mapToKiteableWindDetected(event.value());
-                    context.forward(new Record<>(kiteableWind.getSensorId(), kiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                    var kiteableWindSpeed = mapToKiteableWindDetected(event.value());
+                    context.forward(new Record<>(kiteableWindSpeed.getSensorId(), new WindSpeedDetected(kiteableWindSpeed), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                 } else {
-                    var notKiteableWind = mapToNotKiteableWindDetected(event.value());
-                    context.forward(new Record<>(notKiteableWind.getSensorId(), notKiteableWind, Instant.now(clock).toEpochMilli(), new RecordHeaders()));
+                    var notKiteableWindSpeed = mapToNotKiteableWindDetected(event.value());
+                    context.forward(new Record<>(notKiteableWindSpeed.getSensorId(), new WindSpeedDetected(notKiteableWindSpeed), Instant.now(clock).toEpochMilli(), new RecordHeaders()));
                 }
             }
         }
@@ -89,8 +90,8 @@ public class WindProcessor implements Processor<String, RawDataMeasured, String,
         return event.key().contains(WIND_SPEED_SENSOR_ID);
     }
 
-    private KiteableWindDetected mapToKiteableWindDetected(RawDataMeasured rawDataMeasured) {
-        return KiteableWindDetected.newBuilder()
+    private KiteableWindSpeedDetected mapToKiteableWindDetected(RawDataMeasured rawDataMeasured) {
+        return KiteableWindSpeedDetected.newBuilder()
                 .setSensorId(rawDataMeasured.getSensorId())
                 .setLocation(rawDataMeasured.getLocation())
                 .setValue(rawDataMeasured.getValue())
@@ -99,8 +100,8 @@ public class WindProcessor implements Processor<String, RawDataMeasured, String,
                 .build();
     }
 
-    private UnkiteableWindDetected mapToNotKiteableWindDetected(RawDataMeasured rawDataMeasured) {
-        return UnkiteableWindDetected.newBuilder()
+    private UnkiteableWindSpeedDetected mapToNotKiteableWindDetected(RawDataMeasured rawDataMeasured) {
+        return UnkiteableWindSpeedDetected.newBuilder()
                 .setSensorId(rawDataMeasured.getSensorId())
                 .setLocation(rawDataMeasured.getLocation())
                 .setValue(rawDataMeasured.getValue())

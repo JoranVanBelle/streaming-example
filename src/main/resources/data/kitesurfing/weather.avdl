@@ -1,0 +1,53 @@
+@namespace("org.streaming.example.adapter.events")
+protocol windDirection {
+
+	record UnknownRecord {}
+
+	/** Created when the weather is kiteable" */
+	record KiteableWeatherDetected {
+		/** The id of the event */
+		string dataId = "";
+		/** The location of where the weather is kiteable */
+		string location = "";
+		/** The wind speed measured at the location */
+		string windSpeed = "";
+		/** The unit in which the wind speed is measured */
+		string windSpeedUnit = "";
+		/** The height of the wave measured at the location */
+		string waveHeight = "";
+		/** The unit in which the wave height is measured */
+		string waveHeightUnit = "";
+		/** The wind direction measured at the location */
+		string windDirection = "";
+		/** The unit in which the wind direction is measured */
+		string windDirectionUnit = "";
+	}
+
+	/** Created when the weather is not kiteable" */
+	record UnkiteableWeatherDetected {
+		/** The id of the event */
+		string dataId;
+		/** The location of where the weather is kiteable */
+		string location;
+		/** The wind speed measured at the location */
+		string windSpeed;
+		/** The unit in which the wind speed is measured */
+		string windSpeedUnit;
+		/** The height of the wave measured at the location */
+		string waveHeight;
+		/** The unit in which the wave height is measured */
+		string waveHeightUnit;
+		/** The wind direction measured at the location */
+		string windDirection;
+		/** The unit in which the wind direction is measured */
+		string windDirectionUnit;
+	}
+
+	record WeatherDetected {
+		union {
+			UnknownRecord,
+			KiteableWeatherDetected,
+			UnkiteableWeatherDetected
+		} state;
+	}
+}

@@ -2,14 +2,12 @@ package org.streaming.example.infrastructure.processor;
 
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.processor.api.Record;
-import org.streaming.example.FeedbackGiven;
+import org.streaming.example.adapter.events.FeedbackGiven;
 import org.streaming.example.domain.FeedbackEntity;
 import org.streaming.example.domain.FeedbackRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
-import static java.time.format.DateTimeFormatter.ofPattern;
 
 public class FeedbackDatabaseWriterProcessor implements Processor<String, FeedbackGiven, Void, Void> {
 

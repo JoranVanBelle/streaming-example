@@ -1,6 +1,6 @@
 package org.streaming.example.mothers;
 
-import org.streaming.example.UnkiteableWindDirectionDetected;
+import org.streaming.example.adapter.events.UnkiteableWindDirectionDetected;
 
 public class UnkiteableWindDirectionDetectedMother {
     private String sensorId;
