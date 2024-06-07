@@ -2,13 +2,16 @@ package org.streaming.example.adapter.kafka;
 
 import org.apache.avro.specific.SpecificRecord;
 import org.springframework.stereotype.Component;
+import org.streaming.example.FeedbackGiven;
 import org.streaming.example.domain.AvroSerdesFactory;
+import org.streaming.example.domain.FeedbackRepository;
 import org.streaming.example.domain.WeatherRepository;
 import org.streaming.example.domain.kafka.ProcessorDefinition;
 import org.streaming.example.domain.kafka.SinkDefinition;
 import org.streaming.example.domain.kafka.SourceDefinition;
 import org.streaming.example.domain.kafka.StateStoreDefinition;
 import org.streaming.example.domain.kafka.TopologyDefinition;
+import org.streaming.example.infrastructure.processor.FeedbackDatabaseWriterProcessor;
 import org.streaming.example.infrastructure.processor.WeatherDatabaseWriterProcessor;
 
 import java.util.List;
@@ -19,11 +22,13 @@ public class DatabaseWriterTopologyDefinition implements TopologyDefinition {
     private final KafkaTopicsProperties kafkaTopicsProperties;
     private final AvroSerdesFactory avroSerdesFactory;
     private final WeatherRepository weatherRepository;
+    private final FeedbackRepository feedbackRepository;
 
-    public DatabaseWriterTopologyDefinition(KafkaTopicsProperties kafkaTopicsProperties, AvroSerdesFactory avroSerdesFactory, org.streaming.example.domain.WeatherRepository weatherRepository) {
+    public DatabaseWriterTopologyDefinition(KafkaTopicsProperties kafkaTopicsProperties, AvroSerdesFactory avroSerdesFactory, WeatherRepository weatherRepository, FeedbackRepository feedbackRepository) {
         this.kafkaTopicsProperties = kafkaTopicsProperties;
         this.avroSerdesFactory = avroSerdesFactory;
         this.weatherRepository = weatherRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     @Override
@@ -31,6 +36,10 @@ public class DatabaseWriterTopologyDefinition implements TopologyDefinition {
         return List.of(
                 SourceDefinition.newSourceDefinition()
                         .withTopic(kafkaTopicsProperties.getKiteWeatherDetected())
+                        .withValueDeserializer(avroSerdesFactory.specificAvroValueDeserializer())
+                        .build(),
+                SourceDefinition.newSourceDefinition()
+                        .withTopic(kafkaTopicsProperties.getFeedbackGiven())
                         .withValueDeserializer(avroSerdesFactory.specificAvroValueDeserializer())
                         .build()
         );
@@ -42,7 +51,12 @@ public class DatabaseWriterTopologyDefinition implements TopologyDefinition {
                         .withName(WeatherDatabaseWriterProcessor.NAME)
                         .withParents(kafkaTopicsProperties.getKiteWeatherDetected())
                         .withProcessorSupplier(() -> new WeatherDatabaseWriterProcessor(weatherRepository))
-                .build()
+                .build(),
+                ProcessorDefinition.<String, FeedbackGiven, Void, Void>newProcessorDefinition()
+                        .withName(FeedbackDatabaseWriterProcessor.NAME)
+                        .withParents(kafkaTopicsProperties.getFeedbackGiven())
+                        .withProcessorSupplier(() -> new FeedbackDatabaseWriterProcessor(feedbackRepository))
+                        .build()
         );
     }
 

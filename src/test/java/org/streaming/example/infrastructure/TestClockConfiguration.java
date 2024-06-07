@@ -19,7 +19,7 @@ public class TestClockConfiguration {
     @Primary
     Clock testClock() {
         return new MutableClock(Instant.parse("2001-06-19T23:00:00.00Z"),
-                ZoneId.of("Europe/Brussels"));
+                ZoneId.of("Europe/London"));
     }
 
 }

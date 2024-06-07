@@ -18,6 +18,15 @@ public class KafkaTopicsProperties {
     private String rekeyedWaveDetected;
     private String rekeyedWindDirectionDetected;
     private String kiteWeatherDetected;
+    private String feedbackGiven;
+
+    public String getFeedbackGiven() {
+        return feedbackGiven;
+    }
+
+    public void setFeedbackGiven(String feedbackGiven) {
+        this.feedbackGiven = feedbackGiven;
+    }
 
     public String getKiteWeatherDetected() {
         return kiteWeatherDetected;

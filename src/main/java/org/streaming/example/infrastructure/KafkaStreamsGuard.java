@@ -1,6 +1,8 @@
 package org.streaming.example.infrastructure;
 
 import org.apache.kafka.streams.KafkaStreams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.kafka.StreamsBuilderFactoryBeanCustomizer;
 import org.springframework.context.ApplicationContext;
@@ -15,6 +17,8 @@ import static org.apache.kafka.streams.KafkaStreams.State.ERROR;
  */
 @Configuration
 public class KafkaStreamsGuard implements KafkaStreams.StateListener {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaStreamsGuard.class.getSimpleName());
 
     private final ApplicationContext ctx;
 
@@ -31,8 +35,7 @@ public class KafkaStreamsGuard implements KafkaStreams.StateListener {
     @Override
     public void onChange(KafkaStreams.State newState, KafkaStreams.State oldState) {
         if(newState == ERROR) {
-            SpringApplication.exit(ctx);
-            System.exit(1);
+            LOGGER.error("Something went wrong");
         }
     }
 }

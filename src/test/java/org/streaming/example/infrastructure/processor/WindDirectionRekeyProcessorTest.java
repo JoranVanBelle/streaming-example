@@ -15,6 +15,7 @@ import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
 import org.streaming.example.domain.TopologyTest;
+import org.streaming.example.infrastructure.KafkaContainerSupport;
 import org.streaming.example.mothers.KiteableWindDirectionDetectedMother;
 
 import java.util.UUID;
@@ -22,7 +23,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TopologyTest
-public class WindDirectionRekeyProcessorTest {
+public class WindDirectionRekeyProcessorTest extends KafkaContainerSupport {
 
     @MockBean
     WeatherPublisher weatherPublisher;

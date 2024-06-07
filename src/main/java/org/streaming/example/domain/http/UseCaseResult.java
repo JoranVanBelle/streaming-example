@@ -1,9 +1,5 @@
 package org.streaming.example.domain.http;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.streaming.example.domain.WeatherEntity;
-
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -14,7 +10,6 @@ import java.util.Objects;
  */
 public record UseCaseResult<Data>(
         ResponseEntityStatus status,
-        @JsonProperty("weather")
         Data data
 ) {
 

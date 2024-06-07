@@ -9,10 +9,13 @@ example:
         - NP7WRS
         - NPBGH1
         - NP7WVC
+  feedback:
+    anonymous-usernames:
+      - WaveWizard
 
 spring:
   datasource:
-    url: jdbc:tc:postgresql:16.1:///COMPLIANCE
+    url: jdbc:tc:postgresql:16.1:///Example
     username: username
     password: password
   kafka:
@@ -25,8 +28,6 @@ spring:
       clientId: ${random.uuid}
 
     properties:
-      auto.register.schemas: true
       schema.registry.url: mock://schema-registry
       specific.avro.reader: true
-      allow.auto.create.topics: true
       value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicRecordNameStrategy

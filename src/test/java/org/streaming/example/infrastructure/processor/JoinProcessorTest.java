@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.streaming.example.KiteableWaveDetected;
 import org.streaming.example.KiteableWeatherDetected;
@@ -23,17 +26,27 @@ import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
 import org.streaming.example.domain.TopologyTest;
+import org.streaming.example.infrastructure.KafkaContainerSupport;
 import org.streaming.example.mothers.KiteableWaveDetectedMother;
 import org.streaming.example.mothers.KiteableWindDirectionDetectedMother;
 import org.streaming.example.mothers.KiteableWindSpeedDetectedMother;
 import org.streaming.example.mothers.UnkiteableWaveDetectedMother;
 import org.streaming.example.mothers.UnkiteableWindDirectionDetectedMother;
 import org.streaming.example.mothers.UnkiteableWindSpeedDetectedMother;
+import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TopologyTest
-public class JoinProcessorTest {
+@TopologyTest(
+        includeFilters = @ComponentScan.Filter(
+                type = FilterType.REGEX,
+                pattern = {
+                      ".*\\infrastructure\\.*"
+                }
+        )
+)
+public class JoinProcessorTest extends KafkaContainerSupport {
 
     @MockBean
     WeatherPublisher weatherPublisher;

@@ -141,6 +141,7 @@ services:
         kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.rekeyed-wave-detected --replication-factor 1 --partitions 1
         kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.rekeyed-wind-direction-detected --replication-factor 1 --partitions 1
         kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.weather-detected --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic org.streaming.example.feedback-given --replication-factor 1 --partitions 1
         
         kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic streaming-example-streams-WindProcessorStateStore-changelog --replication-factor 1 --partitions 1
         kafka-topics --bootstrap-server redpanda-1:29092 --create --if-not-exists --topic streaming-example-streams-WaveProcessorStateStore-changelog --replication-factor 1 --partitions 1

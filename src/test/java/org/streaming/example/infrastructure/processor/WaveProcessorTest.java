@@ -7,23 +7,34 @@ import org.apache.kafka.streams.TestInputTopic;
 import org.apache.kafka.streams.TestOutputTopic;
 import org.apache.kafka.streams.TopologyTestDriver;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.streaming.example.KiteableWaveDetected;
 import org.streaming.example.UnkiteableWaveDetected;
 import org.streaming.example.adapter.kafka.KafkaTopicsProperties;
 import org.streaming.example.adapter.kafka.WeatherPublisher;
 import org.streaming.example.domain.AvroSerdesFactory;
 import org.streaming.example.domain.TopologyTest;
+import org.streaming.example.infrastructure.KafkaContainerSupport;
 import org.streaming.example.mothers.RawWaveHeightMeasured;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TopologyTest
-class WaveProcessorTest {
+@TopologyTest(
+    includeFilters = @ComponentScan.Filter(
+        type = FilterType.REGEX,
+        pattern = {
+            ".*\\infrastructure\\.*"
+        }
+    )
+)
+class WaveProcessorTest extends KafkaContainerSupport {
 
     @MockBean
     WeatherPublisher weatherPublisher;

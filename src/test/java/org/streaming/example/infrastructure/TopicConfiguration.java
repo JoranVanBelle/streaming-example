@@ -40,7 +40,8 @@ public class TopicConfiguration {
                 TopicBuilder.name(kafkaTopicsProperties.getRekeyedWindDetected()).build(),
                 TopicBuilder.name(kafkaTopicsProperties.getRekeyedWaveDetected()).build(),
                 TopicBuilder.name(kafkaTopicsProperties.getRekeyedWindDirectionDetected()).build(),
-                TopicBuilder.name(kafkaTopicsProperties.getKiteWeatherDetected()).build()
+                TopicBuilder.name(kafkaTopicsProperties.getKiteWeatherDetected()).build(),
+                TopicBuilder.name(kafkaTopicsProperties.getFeedbackGiven()).build()
         );
     }
 

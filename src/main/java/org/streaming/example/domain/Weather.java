@@ -6,13 +6,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import java.util.StringJoiner;
 
 /**
  * The weatherObject in the database that is also returned via the controller
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WeatherEntity implements Comparable<WeatherEntity> {
+public class Weather implements Comparable<Weather> {
 
     private String location;
     private LocalDateTime timestamp;
@@ -24,7 +23,7 @@ public class WeatherEntity implements Comparable<WeatherEntity> {
     private String windDirectionUnit;
     private String status;
 
-    public WeatherEntity(
+    public Weather(
             String location,
             LocalDateTime timestamp,
             Double windSpeed,
@@ -157,7 +156,7 @@ public class WeatherEntity implements Comparable<WeatherEntity> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        WeatherEntity that = (WeatherEntity) o;
+        Weather that = (Weather) o;
         return Objects.equals(location, that.location) && Objects.equals(timestamp, that.timestamp) && Objects.equals(windSpeed, that.windSpeed) && Objects.equals(windSpeedUnit, that.windSpeedUnit) && Objects.equals(waveHeight, that.waveHeight) && Objects.equals(waveHeightUnit, that.waveHeightUnit) && Objects.equals(windDirection, that.windDirection) && Objects.equals(windDirectionUnit, that.windDirectionUnit) && Objects.equals(status, that.status);
     }
 
@@ -167,22 +166,7 @@ public class WeatherEntity implements Comparable<WeatherEntity> {
     }
 
     @Override
-    public String toString() {
-        return new StringJoiner(", ", WeatherEntity.class.getSimpleName() + "[", "]")
-                .add("location=" + location)
-                .add("timestamp=" + timestamp)
-                .add("windSpeed=" + windSpeed)
-                .add("windSpeedUnit=" + windSpeedUnit)
-                .add("waveHeight=" + waveHeight)
-                .add("waveHeightUnit=" + waveHeightUnit)
-                .add("windDirection=" + windDirectionUnit)
-                .add("windDirectionUnit=" + windDirectionUnit)
-                .add("status=" + status)
-                .toString();
-    }
-
-    @Override
-    public int compareTo(WeatherEntity old) {
+    public int compareTo(Weather old) {
         return old.location().compareTo(location());
     }
 
@@ -247,8 +231,8 @@ public class WeatherEntity implements Comparable<WeatherEntity> {
             return this;
         }
 
-        public WeatherEntity build() {
-            return new WeatherEntity(
+        public Weather build() {
+            return new Weather(
                     location,
                     timestamp,
                     windSpeed,

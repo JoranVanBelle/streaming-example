@@ -24,6 +24,26 @@ example:
       from: 235
       until: 45
 
+  feedback:
+    anonymous-usernames:
+      - WaveWizard
+      - MermaidMischief
+      - CaptainCrabClaws
+      - JellyfishJester
+      - SquidSquabble
+      - OctoGiggle
+      - FishyFoolery
+      - BarnacleBanter
+      - SubmarineSnicker
+      - NauticalNonsense
+      - CoralComedy
+      - SeagullGuffaw
+      - MobyJoke
+      - AnchorAntics
+      - MarinerMirth
+      - SeashoreSilliness
+      - LobsterLolz
+
   kafka:
     topics:
       raw-data-measured: org.streaming.example.raw-data-measured
@@ -34,6 +54,7 @@ example:
       rekeyed-wave-detected: org.streaming.example.rekeyed-wave-detected
       rekeyed-wind-direction-detected: org.streaming.example.rekeyed-wind-direction-detected
       kite-weather-detected: org.streaming.example.weather-detected
+      feedback-given: org.streaming.example.feedback-given
 
 spring:
   docker:

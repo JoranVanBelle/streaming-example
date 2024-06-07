@@ -46,12 +46,4 @@ public class MutableClock extends Clock {
     public void set(Instant instant) {
         this.instant = instant;
     }
-
-    public static MutableClock fixed(Instant instant, ZoneId zone) {
-        return new MutableClock(instant, zone);
-    }
-
-    public static MutableClock fixed(OffsetDateTime offsetDateTime) {
-        return fixed(offsetDateTime.toInstant(), offsetDateTime.getOffset());
-    }
 }
