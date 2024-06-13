@@ -9,6 +9,10 @@ import java.util.List;
 @ConfigurationProperties("example.feedback")
 public class FeedbackUsernameProperties {
 
+    /**
+     * The list of usernames in case someone chooses to enter
+     * feedback anonymously.
+     */
     private List<String> anonymousUsernames;
 
     public List<String> getAnonymousUsernames() {

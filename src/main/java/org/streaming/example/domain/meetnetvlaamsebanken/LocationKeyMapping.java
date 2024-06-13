@@ -9,6 +9,11 @@ import java.util.Map;
 @ConfigurationProperties("example.http.meetnet-vlaamse-banken.location-key")
 public class LocationKeyMapping {
 
+    /**
+     * The mapping used to map sensors onto locations.<br/>
+     *      - Key: Sensor-prefix<br/>
+     *      - Value: location of the sensor<br/>
+     */
     private Map<String, String> mapping;
 
     public Map<String, String> getMapping() {
