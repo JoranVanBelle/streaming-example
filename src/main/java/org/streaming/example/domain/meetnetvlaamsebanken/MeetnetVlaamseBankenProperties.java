@@ -9,9 +9,28 @@ import java.util.List;
 @ConfigurationProperties("example.http.meetnet-vlaamse-banken")
 public final class MeetnetVlaamseBankenProperties {
 
+    /**
+     * The base url used to fetch the data from Meetnet Vlaamse banken
+     */
     private String baseUrl;
+
+    /**
+     * The username used to login to Meetnet Vlaamse Banken
+     */
     private String username;
+
+    /**
+     * The password used to login to Meetnet Vlaamse Banken
+     */
     private String password;
+
+    /**
+     * The list of sensors used to collect data from.<br/>
+     * In case of kiteable weather, you need to have 3 types of sensors:<br/>
+     *      - Wind speed<br/>
+     *      - Wave height<br/>
+     *      - Wind direction<br/>
+     */
     private List<String> sensorIds;
 
     public List<String> getSensorIds() {

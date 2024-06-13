@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "example.http.meetnet-vlaamse-banken.poll-interval",
+      "type": "java.lang.String",
+      "description": "The amount of milliseconds between two fetches of data."
+    },
+    {
+      "name": "example.weather.wind-speed",
+      "type": "java.lang.Double",
+      "description": "The threshold of the wind speed that is acceptable."
+    },
+    {
+      "name": "example.weather.wave-height",
+      "type": "java.lang.Integer",
+      "description": "The threshold of the wave height that is acceptable."
+    },
+    {
+      "name": "example.weather.wind-direction.from",
+      "type": "java.lang.Integer",
+      "description": "The upperbound of the wind direction that is accaptable."
+    },
+    {
+      "name": "example.weather.wind-direction.until",
+      "type": "java.lang.Integer",
+      "description": "The lower bound of the wind direction that is accaptable."
+    }
+  ]
+}
